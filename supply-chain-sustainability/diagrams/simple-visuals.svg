@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+  <defs>
+    <style>
+      .box { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 12; ry: 12; }
+      .title { font: 600 20px Arial, sans-serif; fill: #0f172a; }
+      .text { font: 16px Arial, sans-serif; fill: #0f172a; }
+      .arrow { stroke: #0f172a; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a"/>
+    </marker>
+  </defs>
+
+  <rect x="40" y="140" width="200" height="90" class="box"/>
+  <text x="60" y="180" class="title">Data Sources</text>
+  <text x="60" y="210" class="text">ERP, IoT, Suppliers</text>
+
+  <rect x="320" y="140" width="200" height="90" class="box"/>
+  <text x="340" y="180" class="title">Ingestion</text>
+  <text x="340" y="210" class="text">Clean &amp; Validate</text>
+
+  <rect x="600" y="140" width="200" height="90" class="box"/>
+  <text x="620" y="180" class="title">AI/ML</text>
+  <text x="620" y="210" class="text">Models &amp; Optimization</text>
+
+  <rect x="880" y="140" width="260" height="90" class="box"/>
+  <text x="900" y="180" class="title">Insights</text>
+  <text x="900" y="210" class="text">Dashboards &amp; Reports</text>
+
+  <path d="M240 185 L320 185" class="arrow"/>
+  <path d="M520 185 L600 185" class="arrow"/>
+  <path d="M800 185 L880 185" class="arrow"/>
+</svg>

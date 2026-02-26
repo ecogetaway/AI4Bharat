@@ -1,0 +1,24 @@
+## Hackathon Idea Summary: MedBot - AI-Powered Patient Education & Care Navigation Assistant
+
+I've developed a hackathon idea that aligns perfectly with your problem statement. Here's what you can implement:
+
+### **Idea Overview**
+MedBot addresses the critical challenge of patient education and care navigation in healthcare systems. It simplifies complex medical information for patients, automates routine tasks for healthcare professionals, and improves overall care efficiency.
+
+### **Key Features**
+1. **Medical Document Summarization**: Converts complex test results, prescriptions, and discharge summaries into plain language
+2. **Personalized Care Navigation**: Guides patients through their healthcare journey based on medical history
+3. **AI-Powered Q&A**: Answers patient questions about conditions, treatments, medications, and procedures
+4. **Tailored Education Materials**: Generates personalized patient education content with visual aids
+5. **Automated Reminders**: Sends follow-up reminders for appointments, medication adherence, and test preparations
+6. **Healthcare System Integration**: Connects with EHR/EMR platforms and patient portals
+7. **HIPAA-Compliant**: Ensures data security and regulatory compliance
+8. **Multi-Language Support**: Serves diverse patient populations
+9. **Provider Dashboard**: Analytics for tracking patient engagement
+
+### **Kiro Prompts Ready**
+I've created two comprehensive Kiro prompts:
+1. **requirements.md prompt**: Generates detailed functional and non-functional requirements
+2. **design.md prompt**: Creates architectural, UI/UX, and technical design specifications
+
+These prompts will help you quickly generate professional documentation for your hackathon submission. The idea is innovative, addresses real healthcare challenges, and fits within the hackathon guidelines.

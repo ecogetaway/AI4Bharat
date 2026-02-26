@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="760" viewBox="0 0 1500 760">
+  <defs>
+    <style>
+      .box { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 12; ry: 12; }
+      .title { font: 600 20px Arial, sans-serif; fill: #0f172a; }
+      .text { font: 16px Arial, sans-serif; fill: #0f172a; }
+      .arrow { stroke: #0f172a; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a"/>
+    </marker>
+  </defs>
+
+  <rect x="40" y="40" width="320" height="110" class="box"/>
+  <text x="60" y="80" class="title">Data Sources</text>
+  <text x="60" y="110" class="text">ERP, Suppliers, IoT, Logistics</text>
+
+  <rect x="420" y="40" width="320" height="110" class="box"/>
+  <text x="440" y="80" class="title">Ingestion &amp; Quality</text>
+  <text x="440" y="110" class="text">ETL, Validation, Normalization</text>
+
+  <rect x="800" y="20" width="300" height="110" class="box"/>
+  <text x="820" y="60" class="title">Data Lake / Warehouse</text>
+  <text x="820" y="90" class="text">Raw + Curated Data</text>
+
+  <rect x="1180" y="20" width="280" height="110" class="box"/>
+  <text x="1200" y="60" class="title">AI/ML Platform</text>
+  <text x="1200" y="90" class="text">Training + Inference</text>
+
+  <rect x="420" y="210" width="320" height="110" class="box"/>
+  <text x="440" y="250" class="title">Emissions Engine</text>
+  <text x="440" y="280" class="text">Scope 1/2/3 Calculator</text>
+
+  <rect x="800" y="210" width="300" height="110" class="box"/>
+  <text x="820" y="250" class="title">Optimization</text>
+  <text x="820" y="280" class="text">Routing + Sourcing</text>
+
+  <rect x="1180" y="210" width="280" height="110" class="box"/>
+  <text x="1200" y="250" class="title">Compliance</text>
+  <text x="1200" y="280" class="text">GRI, CSRD, TCFD</text>
+
+  <rect x="420" y="400" width="1040" height="130" class="box"/>
+  <text x="440" y="440" class="title">API Layer</text>
+  <text x="440" y="470" class="text">REST / GraphQL / WebSockets</text>
+
+  <rect x="40" y="580" width="460" height="130" class="box"/>
+  <text x="60" y="620" class="title">User Interfaces</text>
+  <text x="60" y="650" class="text">Dashboards, Reports, Alerts</text>
+
+  <rect x="560" y="580" width="460" height="130" class="box"/>
+  <text x="580" y="620" class="title">Integrations</text>
+  <text x="580" y="650" class="text">ERP, BI, Partner APIs</text>
+
+  <rect x="1080" y="580" width="380" height="130" class="box"/>
+  <text x="1100" y="620" class="title">Observability</text>
+  <text x="1100" y="650" class="text">Logs, Metrics, Audit Trails</text>
+
+  <path d="M360 95 L420 95" class="arrow"/>
+  <path d="M740 95 L800 75" class="arrow"/>
+  <path d="M1100 75 L1180 75" class="arrow"/>
+  <path d="M800 120 L740 210" class="arrow"/>
+  <path d="M950 120 L950 210" class="arrow"/>
+  <path d="M1100 120 L1180 210" class="arrow"/>
+  <path d="M740 265 L800 265" class="arrow"/>
+  <path d="M1100 265 L1180 265" class="arrow"/>
+  <path d="M900 320 L900 400" class="arrow"/>
+  <path d="M900 530 L900 580" class="arrow"/>
+</svg>
