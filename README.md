@@ -192,8 +192,26 @@ AI4Bharat/
 **Team EcoGetaway**  
 AI4Bharat Hackathon 2026  
 *AI for Rural Innovation & Sustainable Systems*
-
 ---
+## 🙏 Attributions & Open Source Credits
+
+### AI/ML Model References
+- **Isolation Forest** — Liu, F.T., Ting, K.M., Zhou, Z.H. (2008). [Isolation Forest](https://ieeexplore.ieee.org/document/4781136). IEEE ICDM.
+- **DBSCAN** — Ester, M., Kriegel, H.P., Sander, J., Xu, X. (1996). [A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases](https://dl.acm.org/doi/10.5555/3001460.3001507). KDD-96.
+- **LSTM** — Hochreiter, S., Schmidhuber, J. (1997). [Long Short-Term Memory](https://dl.acm.org/doi/10.1162/neco.1997.9.8.1735). Neural Computation, 9(8).
+- **Temporal Fusion Transformer** — Lim, B., Arık, S., Loeff, N., Pfister, T. (2021). [Temporal Fusion Transformers for Interpretable Multi-horizon Time Series Forecasting](https://arxiv.org/abs/1912.09363). IJF.
+- **GraphSAGE** — Hamilton, W., Ying, R., Leskovec, J. (2017). [Inductive Representation Learning on Large Graphs](https://arxiv.org/abs/1706.03762). NeurIPS.
+- **XGBoost** — Chen, T., Guestrin, C. (2016). [XGBoost: A Scalable Tree Boosting System](https://arxiv.org/abs/1603.02754). KDD.
+
+### Frontend Libraries
+- [React](https://github.com/facebook/react) — MIT License
+- [Vite](https://github.com/vitejs/vite) — MIT License
+- [Recharts](https://github.com/recharts/recharts) — MIT License
+- [React Router](https://github.com/remix-run/react-router) — MIT License
+
+### Development Tools
+- [Kiro](https://kiro.dev) — AI-powered IDE used for prototype generation
+- [Claude](https://anthropic.com) — AI assistant used for architecture, documentation, and demo script
 
 ## 📄 License
 
