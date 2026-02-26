@@ -211,7 +211,6 @@ AI4Bharat Hackathon 2026
 
 ### Development Tools
 - [Kiro](https://kiro.dev) — AI-powered IDE used for prototype generation
-- [Claude](https://anthropic.com) — AI assistant used for architecture, documentation, and demo script
 
 ## 📄 License
 
