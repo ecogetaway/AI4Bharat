@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { farmerData } from '../data/mockData'
 import farmerAvatar from '../assets/farmer-avatar.jpeg'
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime'
 import './RuralFarmerDashboard.css'
 
 const COLORS = ['#ef5350', '#ff7043', '#ffa726', '#66bb6a', '#42a5f5']
@@ -19,6 +20,121 @@ function RuralFarmerDashboard() {
     carbonCredits,
     recommendations 
   } = farmerData;
+
+  // State for AI recommendations
+  const [aiRecommendations, setAiRecommendations] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [formData, setFormData] = useState({
+    farmSize: farmSize.toString(),
+    primaryCrop: 'Rice',
+    fertilizerType: 'Mixed',
+    irrigationMethod: 'Flood',
+    pesticideUsage: 'Medium'
+  })
+
+  // Initialize Bedrock client
+  const bedrockClient = new BedrockRuntimeClient({
+    region: import.meta.env.VITE_AWS_REGION,
+    credentials: {
+      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY
+    }
+  })
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const getAIRecommendations = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const prompt = `Farm Details:
+- Farm Size: ${formData.farmSize} hectares
+- Primary Crop: ${formData.primaryCrop}
+- Fertilizer Type: ${formData.fertilizerType}
+- Irrigation Method: ${formData.irrigationMethod}
+- Pesticide Usage: ${formData.pesticideUsage}
+- Location: ${location}
+
+Please provide exactly 3 specific, actionable recommendations for reducing carbon emissions. For each recommendation, provide:
+1. A clear title (max 8 words)
+2. The carbon emission reduction impact in tonnes CO₂e/year
+3. Initial investment cost in Indian Rupees
+4. Annual savings in Indian Rupees (including carbon credits)
+5. Priority level (high/medium/low)
+
+Format your response as a JSON array with this exact structure:
+[
+  {
+    "title": "recommendation title",
+    "impact": "X.X tonnes CO₂e/year reduction",
+    "cost": "₹X,XXX initial investment",
+    "savings": "₹X,XXX/year savings + ₹X,XXX carbon credits",
+    "priority": "high"
+  }
+]
+
+Include specific Maharashtra government schemes, KVK resources, and local suppliers where applicable.`
+
+      const payload = {
+        anthropic_version: "bedrock-2023-05-31",
+        max_tokens: 2000,
+        system: "You are an expert agricultural sustainability advisor for Indian farmers. Provide specific, actionable recommendations for reducing carbon emissions with exact costs in Indian Rupees, government scheme names, and local resources. Always mention relevant Maharashtra government schemes and KVK resources.",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
+      }
+
+      const command = new InvokeModelCommand({
+        modelId: import.meta.env.VITE_BEDROCK_MODEL_ID,
+        contentType: "application/json",
+        accept: "application/json",
+        body: JSON.stringify(payload)
+      })
+
+      const response = await bedrockClient.send(command)
+      const responseBody = JSON.parse(new TextDecoder().decode(response.body))
+      
+      // Parse the AI response
+      const aiText = responseBody.content[0].text
+      
+      // Extract JSON from the response
+      const jsonMatch = aiText.match(/\[[\s\S]*\]/)
+      if (jsonMatch) {
+        const parsedRecommendations = JSON.parse(jsonMatch[0])
+        
+        // Transform to match our recommendation format
+        const formattedRecommendations = parsedRecommendations.map((rec, index) => ({
+          id: `ai-${index + 1}`,
+          title: rec.title,
+          impact: rec.impact,
+          cost: rec.cost,
+          savings: rec.savings,
+          priority: rec.priority
+        }))
+        
+        setAiRecommendations(formattedRecommendations)
+      } else {
+        throw new Error('Could not parse AI response')
+      }
+    } catch (err) {
+      console.error('Error calling Bedrock:', err)
+      setError('Failed to get AI recommendations. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const displayRecommendations = aiRecommendations || recommendations
 
   return (
     <div className="dashboard">
@@ -228,8 +344,87 @@ function RuralFarmerDashboard() {
       {/* Recommendations */}
       <div className="section-card">
         <h3>💡 AI-Powered Recommendations</h3>
+        
+        {/* AI Recommendation Form */}
+        <div className="ai-form-container">
+          <h4>Get Personalized AI Recommendations</h4>
+          <form className="ai-form" onSubmit={(e) => { e.preventDefault(); getAIRecommendations(); }}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Farm Size (hectares)</label>
+                <input
+                  type="number"
+                  name="farmSize"
+                  value={formData.farmSize}
+                  onChange={handleInputChange}
+                  step="0.1"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Primary Crop</label>
+                <select name="primaryCrop" value={formData.primaryCrop} onChange={handleInputChange}>
+                  <option value="Rice">Rice</option>
+                  <option value="Wheat">Wheat</option>
+                  <option value="Cotton">Cotton</option>
+                  <option value="Sugarcane">Sugarcane</option>
+                  <option value="Pulses">Pulses</option>
+                  <option value="Vegetables">Vegetables</option>
+                  <option value="Fruits">Fruits</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Fertilizer Type</label>
+                <select name="fertilizerType" value={formData.fertilizerType} onChange={handleInputChange}>
+                  <option value="Chemical">Chemical</option>
+                  <option value="Organic">Organic</option>
+                  <option value="Mixed">Mixed</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Irrigation Method</label>
+                <select name="irrigationMethod" value={formData.irrigationMethod} onChange={handleInputChange}>
+                  <option value="Flood">Flood</option>
+                  <option value="Drip">Drip</option>
+                  <option value="Sprinkler">Sprinkler</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Pesticide Usage</label>
+                <select name="pesticideUsage" value={formData.pesticideUsage} onChange={handleInputChange}>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <button type="submit" className="ai-submit-btn" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <span className="spinner"></span>
+                      Getting Recommendations...
+                    </>
+                  ) : (
+                    'Get AI Recommendations'
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+          
+          {error && <div className="error-message">{error}</div>}
+        </div>
+        
+        {/* Recommendations List */}
         <div className="recommendations-list">
-          {recommendations.map((rec, index) => (
+          {displayRecommendations.map((rec, index) => (
             <div key={rec.id} className={`recommendation-card priority-${rec.priority}`}>
               <div className="priority-number">{String(index + 1).padStart(2, '0')}</div>
               <div className="rec-header">
