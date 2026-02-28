@@ -321,9 +321,9 @@ export const cooperativeData = {
     status: "Active Trading",
     
     buyers: [
-      { name: "TechCorp India", credits: 250, value: 750000 },
-      { name: "Green Energy Ltd", credits: 200, value: 600000 },
-      { name: "Sustainable Foods", credits: 170, value: 510000 }
+      { name: "Adani Green Energy", credits: 250, value: 750000 },
+      { name: "EKI Energy Services", credits: 200, value: 600000 },
+      { name: "Omega Healthcare", credits: 170, value: 510000 }
     ]
   },
   
