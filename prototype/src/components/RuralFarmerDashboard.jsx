@@ -1,6 +1,7 @@
 import React from 'react'
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { farmerData } from '../data/mockData'
+import farmerAvatar from '../assets/farmer-avatar.jpeg'
 import './RuralFarmerDashboard.css'
 
 const COLORS = ['#ef5350', '#ff7043', '#ffa726', '#66bb6a', '#42a5f5']
@@ -22,12 +23,15 @@ function RuralFarmerDashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <div>
-          <h2>👨‍🌾 {farmerName}'s Farm Dashboard</h2>
-          <p className="location">📍 {location} | {farmSize} hectares</p>
+        <div className="farmer-profile-card">
+          <img src={farmerAvatar} alt="Farmer Avatar" className="farmer-avatar" />
+          <div className="farmer-info">
+            <h2 className="farmer-name">{farmerName}</h2>
+            <p className="location">📍 {location} | {farmSize} hectares</p>
+          </div>
         </div>
         <div className="header-stats">
-          <div className="stat-badge success">
+          <div className="stat-badge success premium-badge-pulse">
             <span className="stat-label">Sustainability Premium</span>
             <span className="stat-value">+{sustainabilityPremium.premiumPercentage}%</span>
           </div>
@@ -40,7 +44,8 @@ function RuralFarmerDashboard() {
           <div className="metric-icon">🏭</div>
           <div className="metric-content">
             <h3>Total Emissions</h3>
-            <p className="metric-value">{carbonFootprint.totalEmissions} <span>tonnes CO₂e/year</span></p>
+            <p className="metric-value">{carbonFootprint.totalEmissions} <span className="trend-indicator">↓</span></p>
+            <p className="metric-unit">tonnes CO₂e/year</p>
             <p className="metric-sub">{carbonFootprint.emissionsPerHectare} tonnes/hectare</p>
           </div>
         </div>
@@ -49,7 +54,8 @@ function RuralFarmerDashboard() {
           <div className="metric-icon">🌳</div>
           <div className="metric-content">
             <h3>Carbon Sequestration</h3>
-            <p className="metric-value">{carbonSequestration} <span>tonnes CO₂e/year</span></p>
+            <p className="metric-value">{carbonSequestration} <span className="trend-indicator up">↑</span></p>
+            <p className="metric-unit">tonnes CO₂e/year</p>
             <p className="metric-sub success-text">Soil & vegetation capture</p>
           </div>
         </div>
@@ -58,7 +64,8 @@ function RuralFarmerDashboard() {
           <div className="metric-icon">⚖️</div>
           <div className="metric-content">
             <h3>Net Emissions</h3>
-            <p className="metric-value">{netEmissions} <span>tonnes CO₂e/year</span></p>
+            <p className="metric-value">{netEmissions} <span className="trend-indicator">↓</span></p>
+            <p className="metric-unit">tonnes CO₂e/year</p>
             <p className="metric-sub">{((carbonSequestration / carbonFootprint.totalEmissions) * 100).toFixed(1)}% offset</p>
           </div>
         </div>
@@ -67,7 +74,8 @@ function RuralFarmerDashboard() {
           <div className="metric-icon">💰</div>
           <div className="metric-content">
             <h3>Sustainability Premium</h3>
-            <p className="metric-value">₹{sustainabilityPremium.premiumAmount} <span>/quintal</span></p>
+            <p className="metric-value">₹{sustainabilityPremium.premiumAmount} <span className="trend-indicator up">↑</span></p>
+            <p className="metric-unit">per quintal</p>
             <p className="metric-sub success-text">₹{sustainabilityPremium.potentialAnnualIncome.toLocaleString()}/year potential</p>
           </div>
         </div>
@@ -221,8 +229,9 @@ function RuralFarmerDashboard() {
       <div className="section-card">
         <h3>💡 AI-Powered Recommendations</h3>
         <div className="recommendations-list">
-          {recommendations.map((rec) => (
+          {recommendations.map((rec, index) => (
             <div key={rec.id} className={`recommendation-card priority-${rec.priority}`}>
+              <div className="priority-number">{String(index + 1).padStart(2, '0')}</div>
               <div className="rec-header">
                 <h4>{rec.title}</h4>
                 <span className={`priority-badge ${rec.priority}`}>{rec.priority.toUpperCase()}</span>
@@ -236,7 +245,7 @@ function RuralFarmerDashboard() {
                   <span className="rec-icon">💵</span>
                   <span className="rec-text">Investment: {rec.cost}</span>
                 </div>
-                <div className="rec-stat">
+                <div className="rec-stat savings-highlight">
                   <span className="rec-icon">💰</span>
                   <span className="rec-text success-text">Savings: {rec.savings}</span>
                 </div>

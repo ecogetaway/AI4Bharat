@@ -51,7 +51,7 @@ function App() {
         </main>
 
         <footer className="app-footer">
-          <p>AI4Bharat Hackathon 2026 | Rural Ecosystems & Sustainability Track</p>
+          <p>AI4Bharat Hackathon 2026 | Rural Innovation & Sustainable Systems | Built with React + Vite</p>
         </footer>
       </div>
     </Router>

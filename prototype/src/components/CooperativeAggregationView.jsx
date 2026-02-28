@@ -25,19 +25,45 @@ function CooperativeAggregationView() {
   return (
     <div className="cooperative-view">
       <div className="view-header">
-        <div>
+        <div className="header-content">
           <h2>🤝 {cooperativeName}</h2>
-          <p className="coop-info">📍 {location} | {memberCount} Member Farmers | {totalFarmArea.toLocaleString()} hectares</p>
+          <p className="coop-info">📍 {location}</p>
         </div>
-        <div className="header-badges">
-          <div className="badge-item">
-            <span className="badge-label">Total Members</span>
-            <span className="badge-value">{memberCount}</span>
+        <div className="header-stats-cards">
+          <div className="stat-card-large">
+            <div className="stat-icon">👥</div>
+            <div className="stat-content">
+              <span className="stat-label">Members</span>
+              <span className="stat-value">{memberCount}</span>
+            </div>
           </div>
-          <div className="badge-item">
-            <span className="badge-label">Total Area</span>
-            <span className="badge-value">{totalFarmArea.toLocaleString()} ha</span>
+          <div className="stat-card-large">
+            <div className="stat-icon">🌾</div>
+            <div className="stat-content">
+              <span className="stat-label">Total Area</span>
+              <span className="stat-value">{totalFarmArea.toLocaleString()}</span>
+              <span className="stat-unit">hectares</span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="progress-section">
+        <div className="progress-header">
+          <h3>Emission Reduction Progress</h3>
+          <span className="progress-stats">{collectiveImpact.reductionPercentage}% of 20% target</span>
+        </div>
+        <div className="progress-bar-container">
+          <div className="progress-bar" style={{width: `${(collectiveImpact.reductionPercentage / 20) * 100}%`}}></div>
+          <div className="progress-target" style={{left: '100%'}}>
+            <span className="target-marker">🎯</span>
+            <span className="target-label">20% Target</span>
+          </div>
+        </div>
+        <div className="progress-details">
+          <span>Current: {collectiveImpact.reductionPercentage}%</span>
+          <span>Remaining: {(20 - collectiveImpact.reductionPercentage).toFixed(1)}%</span>
         </div>
       </div>
 
@@ -47,7 +73,8 @@ function CooperativeAggregationView() {
           <div className="metric-icon">🏭</div>
           <div className="metric-content">
             <h3>Total Emissions</h3>
-            <p className="metric-value">{aggregatedEmissions.totalEmissions.toLocaleString()} <span>tonnes CO₂e/year</span></p>
+            <p className="metric-value">{aggregatedEmissions.totalEmissions.toLocaleString()} <span className="trend-indicator">↓</span></p>
+            <p className="metric-unit">tonnes CO₂e/year</p>
             <p className="metric-sub">{aggregatedEmissions.emissionsPerHectare} tonnes/hectare avg</p>
           </div>
         </div>
@@ -56,7 +83,8 @@ function CooperativeAggregationView() {
           <div className="metric-icon">🌳</div>
           <div className="metric-content">
             <h3>Total Sequestration</h3>
-            <p className="metric-value">{aggregatedEmissions.totalSequestration.toLocaleString()} <span>tonnes CO₂e/year</span></p>
+            <p className="metric-value">{aggregatedEmissions.totalSequestration.toLocaleString()} <span className="trend-indicator up">↑</span></p>
+            <p className="metric-unit">tonnes CO₂e/year</p>
             <p className="metric-sub success-text">Collective carbon capture</p>
           </div>
         </div>
@@ -65,7 +93,8 @@ function CooperativeAggregationView() {
           <div className="metric-icon">⚖️</div>
           <div className="metric-content">
             <h3>Net Emissions</h3>
-            <p className="metric-value">{aggregatedEmissions.netEmissions.toLocaleString()} <span>tonnes CO₂e/year</span></p>
+            <p className="metric-value">{aggregatedEmissions.netEmissions.toLocaleString()} <span className="trend-indicator">↓</span></p>
+            <p className="metric-unit">tonnes CO₂e/year</p>
             <p className="metric-sub">{((aggregatedEmissions.totalSequestration / aggregatedEmissions.totalEmissions) * 100).toFixed(1)}% offset</p>
           </div>
         </div>
@@ -74,7 +103,8 @@ function CooperativeAggregationView() {
           <div className="metric-icon">📉</div>
           <div className="metric-content">
             <h3>Emission Reduction</h3>
-            <p className="metric-value">{collectiveImpact.emissionReduction} <span>tonnes CO₂e</span></p>
+            <p className="metric-value">{collectiveImpact.emissionReduction} <span className="trend-indicator up">↑</span></p>
+            <p className="metric-unit">tonnes CO₂e</p>
             <p className="metric-sub success-text">{collectiveImpact.reductionPercentage}% vs 2022 baseline</p>
           </div>
         </div>
@@ -359,8 +389,9 @@ function CooperativeAggregationView() {
       <div className="section-card">
         <h3>💡 Cooperative-Level Recommendations</h3>
         <div className="recommendations-list">
-          {recommendations.map((rec) => (
+          {recommendations.map((rec, index) => (
             <div key={rec.id} className={`recommendation-card priority-${rec.priority}`}>
+              <div className="priority-number">{String(index + 1).padStart(2, '0')}</div>
               <div className="rec-header">
                 <h4>{rec.title}</h4>
                 <span className={`priority-badge ${rec.priority}`}>{rec.priority.toUpperCase()}</span>
@@ -374,7 +405,7 @@ function CooperativeAggregationView() {
                   <span className="rec-icon">💵</span>
                   <span className="rec-text">Investment: {rec.cost}</span>
                 </div>
-                <div className="rec-stat">
+                <div className="rec-stat savings-highlight">
                   <span className="rec-icon">💰</span>
                   <span className="rec-text success-text">Savings: {rec.savings}</span>
                 </div>

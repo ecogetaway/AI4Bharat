@@ -19,13 +19,14 @@ function EmissionHotspotView() {
   return (
     <div className="hotspot-view">
       <div className="view-header">
-        <div>
+        <div className="header-content">
           <h2>🔥 Supply Chain Emission Hotspots</h2>
           <p className="product-info">{productName} (SKU: {productId})</p>
         </div>
-        <div className="total-emissions-badge">
-          <span className="badge-label">Total Product Emissions</span>
-          <span className="badge-value">{totalEmissions} kg CO₂e</span>
+        <div className="total-emissions-hero">
+          <span className="hero-label">Total Product Emissions</span>
+          <span className="hero-value">{totalEmissions}</span>
+          <span className="hero-unit">kg CO₂e</span>
         </div>
       </div>
 
@@ -130,6 +131,7 @@ function EmissionHotspotView() {
                   <td>{component.carbonIntensity} kg/kg</td>
                   <td>
                     <span className={`severity-badge ${component.severity}`}>
+                      {component.severity === 'critical' && <span className="severity-pulse"></span>}
                       {component.severity}
                     </span>
                   </td>
@@ -229,8 +231,9 @@ function EmissionHotspotView() {
       <div className="section-card optimization-section">
         <h3>✨ Optimization Opportunities</h3>
         <div className="opportunities-list">
-          {optimizationOpportunities.map((opp) => (
+          {optimizationOpportunities.map((opp, index) => (
             <div key={opp.id} className={`opportunity-card ${opp.noRegret ? 'no-regret' : ''}`}>
+              <div className="priority-number">{String(index + 1).padStart(2, '0')}</div>
               {opp.noRegret && <div className="no-regret-badge">🎯 No-Regret Opportunity</div>}
               
               <div className="opp-header">
@@ -247,7 +250,7 @@ function EmissionHotspotView() {
                   </div>
                 </div>
                 
-                <div className="opp-metric">
+                <div className="opp-metric savings-highlight">
                   <span className="metric-icon">💰</span>
                   <div>
                     <span className="metric-label">Cost Impact</span>
