@@ -71,7 +71,7 @@ function RuralFarmerDashboard() {
         </div>
 
         <div className="metric-card premium">
-          <div className="metric-icon">💰</div>
+          <div className="metric-icon rupee-icon">₹</div>
           <div className="metric-content">
             <h3>Sustainability Premium</h3>
             <p className="metric-value">₹{sustainabilityPremium.premiumAmount} <span className="trend-indicator up">↑</span></p>
@@ -153,7 +153,7 @@ function RuralFarmerDashboard() {
 
       {/* Sustainability Premium */}
       <div className="section-card premium-section">
-        <h3>💰 Sustainability Premium & Market Access</h3>
+        <h3><span className="rupee-icon">₹</span> Sustainability Premium & Market Access</h3>
         <div className="premium-grid">
           <div className="premium-comparison">
             <div className="price-box conventional">
@@ -246,7 +246,7 @@ function RuralFarmerDashboard() {
                   <span className="rec-text">Investment: {rec.cost}</span>
                 </div>
                 <div className="rec-stat savings-highlight">
-                  <span className="rec-icon">💰</span>
+                  <span className="rec-icon rupee-icon">₹</span>
                   <span className="rec-text success-text">Savings: {rec.savings}</span>
                 </div>
               </div>

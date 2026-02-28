@@ -239,7 +239,7 @@ function CooperativeAggregationView() {
             </div>
             
             <div className="credit-box total">
-              <div className="credit-icon">💰</div>
+              <div className="credit-icon rupee-icon">₹</div>
               <div className="credit-content">
                 <span className="credit-label">Total Value</span>
                 <span className="credit-value">₹{(carbonCredits.totalValue / 100000).toFixed(2)} Lakhs</span>
@@ -267,7 +267,7 @@ function CooperativeAggregationView() {
 
       {/* Sustainability Premium */}
       <div className="section-card premium-section">
-        <h3>💰 Collective Sustainability Premium</h3>
+        <h3><span className="rupee-icon">₹</span> Collective Sustainability Premium</h3>
         <div className="premium-overview">
           <div className="premium-stats-grid">
             <div className="premium-stat-card">
@@ -406,7 +406,7 @@ function CooperativeAggregationView() {
                   <span className="rec-text">Investment: {rec.cost}</span>
                 </div>
                 <div className="rec-stat savings-highlight">
-                  <span className="rec-icon">💰</span>
+                  <span className="rec-icon rupee-icon">₹</span>
                   <span className="rec-text success-text">Savings: {rec.savings}</span>
                 </div>
                 <div className="rec-stat">

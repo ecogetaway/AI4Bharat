@@ -251,7 +251,7 @@ function EmissionHotspotView() {
                 </div>
                 
                 <div className="opp-metric savings-highlight">
-                  <span className="metric-icon">💰</span>
+                  <span className="metric-icon rupee-icon">₹</span>
                   <div>
                     <span className="metric-label">Cost Impact</span>
                     <span className={`metric-value ${opp.costImpact < 0 ? 'savings' : 'cost'}`}>

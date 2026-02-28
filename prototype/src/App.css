@@ -107,3 +107,16 @@
     line-height: 1.4;
   }
 }
+
+
+.ai4bharat-badge {
+  display: inline-block;
+  background: #2d6a4f;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}

@@ -17,3 +17,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.rupee-icon {
+  color: #2d6a4f;
+  font-weight: bold;
+}

@@ -13,7 +13,7 @@ function App() {
       <div className="app">
         <header className="app-header">
           <div className="header-content">
-            <h1 className="app-title">🌱 Supply Chain Decarbonization Platform</h1>
+            <h1 className="app-title"><span className="ai4bharat-badge">AI for Bharat</span> Supply Chain Decarbonization Platform</h1>
             <p className="app-subtitle">AI-Powered Carbon Tracking for Rural Ecosystems</p>
           </div>
         </header>
