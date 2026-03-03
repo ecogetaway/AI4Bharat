@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { farmerData } from '../data/mockData'
 import farmerAvatar from '../assets/farmer-avatar.jpeg'
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime'
 import './RuralFarmerDashboard.css'
 
 const COLORS = ['#ef5350', '#ff7043', '#ffa726', '#66bb6a', '#42a5f5']
@@ -54,80 +53,55 @@ function RuralFarmerDashboard() {
     setError(null)
 
     try {
-      const prompt = `Farm Details:
-- Farm Size: ${formData.farmSize} hectares
-- Primary Crop: ${formData.primaryCrop}
-- Fertilizer Type: ${formData.fertilizerType}
-- Irrigation Method: ${formData.irrigationMethod}
-- Pesticide Usage: ${formData.pesticideUsage}
-- Location: ${location}
-
-Please provide exactly 3 specific, actionable recommendations for reducing carbon emissions. For each recommendation, provide:
-1. A clear title (max 8 words)
-2. The carbon emission reduction impact in tonnes CO₂e/year
-3. Initial investment cost in Indian Rupees
-4. Annual savings in Indian Rupees (including carbon credits)
-5. Priority level (high/medium/low)
-
-Format your response as a JSON array with this exact structure:
-[
-  {
-    "title": "recommendation title",
-    "impact": "X.X tonnes CO₂e/year reduction",
-    "cost": "₹X,XXX initial investment",
-    "savings": "₹X,XXX/year savings + ₹X,XXX carbon credits",
-    "priority": "high"
-  }
-]
-
-Include specific Maharashtra government schemes, KVK resources, and local suppliers where applicable.`
-
-      const payload = {
-        anthropic_version: "bedrock-2023-05-31",
-        max_tokens: 2000,
-        system: "You are an expert agricultural sustainability advisor for Indian farmers. Provide specific, actionable recommendations for reducing carbon emissions with exact costs in Indian Rupees, government scheme names, and local resources. Always mention relevant Maharashtra government schemes and KVK resources.",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      }
-
-      const command = new InvokeModelCommand({
-        modelId: import.meta.env.VITE_BEDROCK_MODEL_ID,
-        contentType: "application/json",
-        accept: "application/json",
-        body: JSON.stringify(payload)
+      // TODO: Replace with your orchestrator Lambda Function URL after deployment
+      // Get this from AWS Console → Lambda → ai4bharat-orchestrator → Function URL
+      const ORCHESTRATOR_URL = 'YOUR_ORCHESTRATOR_FUNCTION_URL_HERE'
+      
+      // Call the Orchestrator Lambda (coordinates all 3 agents)
+      const response = await fetch(ORCHESTRATOR_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          farmerName: 'Rajesh Kumar',
+          location: 'Nashik, Maharashtra India',
+          farmSize: parseFloat(formData.farmSize),
+          crop: formData.primaryCrop.toLowerCase(),
+          fertilizerType: formData.fertilizerType,
+          irrigationMethod: formData.irrigationMethod,
+          pesticideUsage: formData.pesticideUsage,
+          expectedYield: parseFloat(formData.farmSize) * 25 // Estimate: 25 quintals/hectare
+        })
       })
 
-      const response = await bedrockClient.send(command)
-      const responseBody = JSON.parse(new TextDecoder().decode(response.body))
-      
-      // Parse the AI response
-      const aiText = responseBody.content[0].text
-      
-      // Extract JSON from the response
-      const jsonMatch = aiText.match(/\[[\s\S]*\]/)
-      if (jsonMatch) {
-        const parsedRecommendations = JSON.parse(jsonMatch[0])
-        
-        // Transform to match our recommendation format
-        const formattedRecommendations = parsedRecommendations.map((rec, index) => ({
-          id: `ai-${index + 1}`,
-          title: rec.title,
-          impact: rec.impact,
-          cost: rec.cost,
-          savings: rec.savings,
-          priority: rec.priority
-        }))
-        
-        setAiRecommendations(formattedRecommendations)
-      } else {
-        throw new Error('Could not parse AI response')
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`)
       }
+
+      const data = await response.json()
+      
+      console.log('Orchestrator response:', data) // For debugging
+      
+      // Transform orchestrator response to match our recommendation format
+      const formattedRecommendations = data.sustainabilityRecommendations?.map((rec, index) => ({
+        id: `ai-${index + 1}`,
+        title: rec.title,
+        impact: `${rec.carbonReduction} tonnes CO₂e/year reduction`,
+        cost: `₹${rec.investment.toLocaleString('en-IN')} initial investment`,
+        savings: `₹${rec.annualSavings.toLocaleString('en-IN')}/year savings`,
+        priority: rec.priority.toLowerCase(),
+        description: rec.description,
+        govtScheme: rec.govtScheme
+      })) || []
+      
+      setAiRecommendations(formattedRecommendations)
+      
+      // Store full orchestrator response for potential use
+      window.orchestratorData = data
+
     } catch (err) {
-      console.error('Error calling Bedrock:', err)
+      console.error('Error getting recommendations:', err)
       setError('Failed to get AI recommendations. Please try again.')
     } finally {
       setLoading(false)

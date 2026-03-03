@@ -1,0 +1,113 @@
+{
+  "weatherAgentTest": {
+    "description": "Test payload for Weather Agent Lambda",
+    "endpoint": "POST /weather-context",
+    "payload": {
+      "body": "{\"location\":\"Nashik, Maharashtra India\",\"crop\":\"grapes\",\"farmSize\":5,\"irrigationType\":\"drip\"}"
+    },
+    "expectedResponse": {
+      "currentWeather": {
+        "temperature": "number",
+        "humidity": "number",
+        "rainfall": "number",
+        "condition": "string"
+      },
+      "forecast7Days": "array",
+      "alerts": "array",
+      "farmingAdvice": {
+        "irrigationRecommendation": "string",
+        "pestRisk": "string",
+        "harvestWindow": "string",
+        "carbonImpact": "string"
+      },
+      "cached": "boolean"
+    }
+  },
+  
+  "marketAgentTest": {
+    "description": "Test payload for Market Agent Lambda",
+    "endpoint": "POST /market-context",
+    "payload": {
+      "body": "{\"location\":\"Nashik, Maharashtra India\",\"crop\":\"grapes\",\"farmSize\":5,\"expectedYield\":125,\"carbonReductionTonnes\":2.5}"
+    },
+    "expectedResponse": {
+      "mandiPrices": {
+        "cropName": "string",
+        "currentPrice": "number",
+        "mspPrice": "number",
+        "nearestMandi": "string",
+        "priceTrend": "RISING/FALLING/STABLE",
+        "bestSellingWindow": "string"
+      },
+      "carbonCredits": {
+        "currentPricePerTonne": "number",
+        "estimatedEarnings": "number",
+        "registrationScheme": "string",
+        "verificationRequired": "string"
+      },
+      "marketAdvice": {
+        "sellNowOrWait": "SELL_NOW/WAIT/PARTIAL_SELL",
+        "reasoning": "string",
+        "alternativeMarkets": "array",
+        "govtSchemes": "array"
+      },
+      "totalPotentialIncome": "number",
+      "cached": "boolean"
+    }
+  },
+  
+  "orchestratorAgentTest": {
+    "description": "Test payload for Orchestrator Agent Lambda (main endpoint)",
+    "endpoint": "POST /farm-advisor",
+    "payload": {
+      "body": "{\"farmerName\":\"Rajesh Kumar\",\"location\":\"Nashik, Maharashtra India\",\"farmSize\":5,\"crop\":\"grapes\",\"fertilizerType\":\"organic\",\"irrigationMethod\":\"drip\",\"pesticideUsage\":\"low\",\"expectedYield\":125}"
+    },
+    "expectedResponse": {
+      "farmerName": "string",
+      "summary": "string",
+      "urgentAlerts": "array",
+      "weatherInsights": "object",
+      "marketInsights": "object",
+      "sustainabilityRecommendations": "array",
+      "totalPotentialSavings": "number",
+      "totalCarbonReduction": "number",
+      "prioritizedActionPlan": "array",
+      "cached": "boolean",
+      "agentsUsed": "array",
+      "timestamp": "string"
+    }
+  },
+  
+  "validationTests": {
+    "description": "Test payloads for input validation",
+    "weatherAgentInvalid": {
+      "body": "{\"location\":\"Nashik\",\"crop\":\"grapes\"}"
+    },
+    "expectedError": {
+      "statusCode": 400,
+      "error": "Invalid input",
+      "details": ["farmSize is required and must be a positive number", "irrigationType is required and must be a string"]
+    }
+  },
+  
+  "additionalTestCases": {
+    "weatherAgent_Mumbai": {
+      "body": "{\"location\":\"Mumbai, Maharashtra India\",\"crop\":\"rice\",\"farmSize\":10,\"irrigationType\":\"flood\"}"
+    },
+    "weatherAgent_Delhi": {
+      "body": "{\"location\":\"Delhi, India\",\"crop\":\"wheat\",\"farmSize\":15,\"irrigationType\":\"sprinkler\"}"
+    },
+    "marketAgent_Cotton": {
+      "body": "{\"location\":\"Nagpur, Maharashtra India\",\"crop\":\"cotton\",\"farmSize\":8,\"expectedYield\":200,\"carbonReductionTonnes\":3.2}"
+    },
+    "marketAgent_Wheat": {
+      "body": "{\"location\":\"Pune, Maharashtra India\",\"crop\":\"wheat\",\"farmSize\":12,\"carbonReductionTonnes\":4.5}"
+    },
+    "orchestrator_SmallFarm": {
+      "body": "{\"farmerName\":\"Suresh Patil\",\"location\":\"Nashik, Maharashtra India\",\"farmSize\":2,\"crop\":\"onion\",\"fertilizerType\":\"chemical\",\"irrigationMethod\":\"drip\",\"pesticideUsage\":\"medium\"}"
+    },
+    "orchestrator_LargeFarm": {
+      "body": "{\"farmerName\":\"Ramesh Deshmukh\",\"location\":\"Pune, Maharashtra India\",\"farmSize\":20,\"crop\":\"sugarcane\",\"fertilizerType\":\"mixed\",\"irrigationMethod\":\"flood\",\"pesticideUsage\":\"high\",\"expectedYield\":500}"
+    }
+  }
+}
