@@ -1,10 +1,65 @@
-import React, { useState } from 'react'
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useState } from 'react'
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { farmerData } from '../data/mockData'
 import farmerAvatar from '../assets/farmer-avatar.jpeg'
 import './RuralFarmerDashboard.css'
 
 const COLORS = ['#ef5350', '#ff7043', '#ffa726', '#66bb6a', '#42a5f5']
+
+const RECOMMENDATIONS_API_URL = 'https://6qg6qznso7.execute-api.ap-south-1.amazonaws.com/recommendations'
+const ORCHESTRATOR_URL = 'https://gylv2iabjpsbte727qkawailjm0xnctf.lambda-url.us-east-1.on.aws/'
+
+// Fallback mock data when orchestrator API fails (for demo/development)
+const MOCK_ORCHESTRATOR_RESPONSE = {
+  sustainabilityRecommendations: [
+    { title: 'Switch to Bio-Fertilizers', carbonReduction: 2.1, investment: 8500, annualSavings: 12000, priority: 'high', description: 'Reduce emissions', govtScheme: 'PM-KUSUM' },
+    { title: 'Install Drip Irrigation', carbonReduction: 1.5, investment: 45000, annualSavings: 18000, priority: 'high', description: 'Save water', govtScheme: 'Per Drop More Crop' }
+  ],
+  weatherInsights: {
+    currentWeather: { temperature: 34, humidity: 62, rainfall: 0, condition: 'Partly Cloudy' },
+    forecast: [
+      { day: 'Wed', temp: 34, humidity: 62, rainfall: 0, condition: 'Partly Cloudy' },
+      { day: 'Thu', temp: 35, humidity: 58, rainfall: 0, condition: 'Sunny' },
+      { day: 'Fri', temp: 33, humidity: 68, rainfall: 2.5, condition: 'Cloudy' },
+      { day: 'Sat', temp: 32, humidity: 72, rainfall: 5, condition: 'Rain' },
+      { day: 'Sun', temp: 31, humidity: 75, rainfall: 3, condition: 'Cloudy' },
+      { day: 'Mon', temp: 33, humidity: 65, rainfall: 0, condition: 'Sunny' },
+      { day: 'Tue', temp: 34, humidity: 60, rainfall: 0, condition: 'Partly Cloudy' }
+    ],
+    alerts: [
+      { type: 'Heat', severity: 'HIGH', message: 'High temperature expected', action: 'Avoid midday fieldwork' },
+      { type: 'Rain', severity: 'MEDIUM', message: 'Rain forecast Fri-Sat', action: 'Delay irrigation' }
+    ],
+    farmingAdvice: {
+      irrigationRecommendation: 'Reduce flood irrigation; consider drip for next season. Current soil moisture adequate.',
+      pestRisk: 'Moderate pest risk due to humidity. Monitor for stem borer in rice.',
+      harvestWindow: 'Optimal harvest window: 2-3 weeks from now. Avoid harvesting during forecast rain.',
+      carbonImpact: 'Drip irrigation can reduce emissions by ~1.5 tonnes CO₂e/year.'
+    }
+  },
+  marketInsights: {
+    mandiPrices: {
+      currentPrice: 2850,
+      mspPrice: 2183,
+      nearestMandi: 'Nashik APMC',
+      priceTrend: 'RISING',
+      bestSellingWindow: 'Next 2 weeks'
+    },
+    carbonCredits: {
+      currentPricePerTonne: 3000,
+      estimatedEarnings: 9600,
+      registrationScheme: 'India Carbon Market (proposed)',
+      verificationRequired: 'Third-party verification needed'
+    },
+    marketAdvice: {
+      sellNowOrWait: 'SELL_NOW',
+      reasoning: 'Current prices above MSP. Market trend rising. Good window to sell before monsoon harvest pressure.',
+      alternativeMarkets: ['Pune APMC', 'Mumbai wholesale'],
+      govtSchemes: ['PM-AASHA', 'e-NAM']
+    },
+    totalPotentialIncome: 76500
+  }
+}
 
 function RuralFarmerDashboard() {
   const { 
@@ -20,8 +75,9 @@ function RuralFarmerDashboard() {
     recommendations 
   } = farmerData;
 
-  // State for AI recommendations
+  // State for AI recommendations and orchestrator data
   const [aiRecommendations, setAiRecommendations] = useState(null)
+  const [orchestratorData, setOrchestratorData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [formData, setFormData] = useState({
@@ -30,15 +86,6 @@ function RuralFarmerDashboard() {
     fertilizerType: 'Mixed',
     irrigationMethod: 'Flood',
     pesticideUsage: 'Medium'
-  })
-
-  // Initialize Bedrock client
-  const bedrockClient = new BedrockRuntimeClient({
-    region: import.meta.env.VITE_AWS_REGION,
-    credentials: {
-      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
-      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY
-    }
   })
 
   const handleInputChange = (e) => {
@@ -53,62 +100,159 @@ function RuralFarmerDashboard() {
     setError(null)
 
     try {
-      // TODO: Replace with your orchestrator Lambda Function URL after deployment
-      // Get this from AWS Console → Lambda → ai4bharat-orchestrator → Function URL
-      const ORCHESTRATOR_URL = 'YOUR_ORCHESTRATOR_FUNCTION_URL_HERE'
-      
-      // Call the Orchestrator Lambda (coordinates all 3 agents)
-      const response = await fetch(ORCHESTRATOR_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          farmerName: 'Rajesh Kumar',
-          location: 'Nashik, Maharashtra India',
-          farmSize: parseFloat(formData.farmSize),
-          crop: formData.primaryCrop.toLowerCase(),
-          fertilizerType: formData.fertilizerType,
-          irrigationMethod: formData.irrigationMethod,
-          pesticideUsage: formData.pesticideUsage,
-          expectedYield: parseFloat(formData.farmSize) * 25 // Estimate: 25 quintals/hectare
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
+      const payload = {
+        farmerName: 'Rajesh Kumar',
+        location: 'Nashik, Maharashtra India',
+        farmSize: parseFloat(formData.farmSize),
+        crop: formData.primaryCrop.toLowerCase(),
+        fertilizerType: formData.fertilizerType,
+        irrigationMethod: formData.irrigationMethod,
+        pesticideUsage: formData.pesticideUsage,
+        expectedYield: parseFloat(formData.farmSize) * 25
       }
 
-      const data = await response.json()
-      
-      console.log('Orchestrator response:', data) // For debugging
-      
-      // Transform orchestrator response to match our recommendation format
+      // In dev, use Vite proxy to avoid CORS; in prod, use Lambda URL directly
+      const apiUrl = import.meta.env.DEV ? '/api/orchestrator' : ORCHESTRATOR_URL
+      const orchestratorResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (!orchestratorResponse.ok) {
+        throw new Error(`Orchestrator API error: ${orchestratorResponse.status}`)
+      }
+
+      let data = await orchestratorResponse.json()
+      console.log('Orchestrator response:', data)
+
+      // Transform API response to match our expected format (API uses forecast7Days, nested farmingAdvice, etc.)
+      if (data.weatherInsights) {
+        const wi = data.weatherInsights
+        data = {
+          ...data,
+          weatherInsights: {
+            currentWeather: wi.currentWeather || {},
+            forecast: wi.forecast || (wi.forecast7Days || []).map((d) => ({
+              day: new Date(d.date).toLocaleDateString('en-IN', { weekday: 'short' }),
+              temp: d.tempMax ?? d.temp,
+              humidity: wi.currentWeather?.humidity ?? '--',
+              rainfall: d.precipitation ?? d.rainfall ?? 0,
+              condition: (d.precipitation > 0 ? 'Rain' : 'Clear')
+            })),
+            alerts: wi.alerts || [],
+            farmingAdvice: wi.farmingAdvice ? {
+              irrigationRecommendation: typeof wi.farmingAdvice.irrigationRecommendation === 'object'
+                ? [wi.farmingAdvice.irrigationRecommendation.advice, wi.farmingAdvice.irrigationRecommendation.timing].filter(Boolean).join(' ')
+                : wi.farmingAdvice.irrigationRecommendation,
+              pestRisk: typeof wi.farmingAdvice.pestRisk === 'object'
+                ? wi.farmingAdvice.pestRisk.assessment
+                : wi.farmingAdvice.pestRisk,
+              harvestWindow: typeof wi.farmingAdvice.harvestWindow === 'object'
+                ? wi.farmingAdvice.harvestWindow.optimalTiming
+                : wi.farmingAdvice.harvestWindow,
+              carbonImpact: typeof wi.farmingAdvice.carbonImpact === 'object'
+                ? wi.farmingAdvice.carbonImpact.considerations
+                : wi.farmingAdvice.carbonImpact
+            } : null
+          }
+        }
+      }
+      if (data.marketInsights?.mandiPrices && !data.marketInsights.mandiPrices.mspPrice) {
+        data.marketInsights.mandiPrices.mspPrice = data.marketInsights.mandiPrices.mspPrice ?? data.marketInsights.mandiPrices.msp
+      }
+      if (data.marketInsights?.marketAdvice?.govtSchemes && !Array.isArray(data.marketInsights.marketAdvice.govtSchemes)) {
+        data.marketInsights.marketAdvice.govtSchemes = []
+      }
+
+      // Transform sustainability recommendations
       const formattedRecommendations = data.sustainabilityRecommendations?.map((rec, index) => ({
         id: `ai-${index + 1}`,
         title: rec.title,
         impact: `${rec.carbonReduction} tonnes CO₂e/year reduction`,
-        cost: `₹${rec.investment.toLocaleString('en-IN')} initial investment`,
-        savings: `₹${rec.annualSavings.toLocaleString('en-IN')}/year savings`,
-        priority: rec.priority.toLowerCase(),
+        cost: `₹${rec.investment?.toLocaleString('en-IN') ?? 0} initial investment`,
+        savings: `₹${rec.annualSavings?.toLocaleString('en-IN') ?? 0}/year savings`,
+        priority: (rec.priority || 'medium').toLowerCase(),
         description: rec.description,
         govtScheme: rec.govtScheme
       })) || []
-      
-      setAiRecommendations(formattedRecommendations)
-      
-      // Store full orchestrator response for potential use
-      window.orchestratorData = data
+
+      // Optionally fetch supplemental recommendations from recommendations API
+      let mergedRecommendations = formattedRecommendations
+      try {
+        const recResponse = await fetch(RECOMMENDATIONS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        if (recResponse.ok) {
+          const recData = await recResponse.json()
+          const supplemental = Array.isArray(recData.recommendations) ? recData.recommendations : (recData.data?.recommendations || [])
+          if (supplemental.length > 0) {
+            const formatted = supplemental.map((r, i) => ({
+              id: `rec-${i + 1}`,
+              title: r.title || r.name,
+              impact: r.impact || r.description || '',
+              cost: r.cost || '',
+              savings: r.savings || '',
+              priority: (r.priority || 'medium').toLowerCase(),
+              description: r.description || '',
+              govtScheme: r.govtScheme
+            }))
+            mergedRecommendations = [...formattedRecommendations, ...formatted]
+          }
+        }
+      } catch (recErr) {
+        console.warn('Recommendations API fallback skipped:', recErr)
+      }
+
+      setAiRecommendations(mergedRecommendations)
+      setOrchestratorData(data)
 
     } catch (err) {
-      console.error('Error getting recommendations:', err)
-      setError('Failed to get AI recommendations. Please try again.')
+      console.error('Orchestrator API error:', err)
+      setError('API temporarily unavailable. Demo data has been loaded automatically — you can explore all features below (Weather Insights, Market Intelligence, etc.). To reload demo data anytime, click "Load demo data".')
+      // Use fallback mock data so Weather Insights & Market Intelligence sections still appear
+      const mockRecs = MOCK_ORCHESTRATOR_RESPONSE.sustainabilityRecommendations?.map((rec, index) => ({
+        id: `mock-${index + 1}`,
+        title: rec.title,
+        impact: `${rec.carbonReduction} tonnes CO₂e/year reduction`,
+        cost: `₹${rec.investment?.toLocaleString('en-IN') ?? 0} initial investment`,
+        savings: `₹${rec.annualSavings?.toLocaleString('en-IN') ?? 0}/year savings`,
+        priority: (rec.priority || 'medium').toLowerCase(),
+        description: rec.description,
+        govtScheme: rec.govtScheme
+      })) || []
+      setAiRecommendations(mockRecs)
+      setOrchestratorData(MOCK_ORCHESTRATOR_RESPONSE)
     } finally {
       setLoading(false)
     }
   }
 
   const displayRecommendations = aiRecommendations || recommendations
+
+  const getSeverityBadgeClass = (severity) => {
+    const s = (severity || '').toUpperCase()
+    if (s === 'HIGH') return 'severity-high'
+    if (s === 'MEDIUM') return 'severity-medium'
+    return 'severity-low'
+  }
+
+  const getForecastData = () => {
+    const w = orchestratorData?.weatherInsights
+    if (w?.forecast && Array.isArray(w.forecast) && w.forecast.length > 0) {
+      return w.forecast
+    }
+    const cur = w?.currentWeather || {}
+    return Array.from({ length: 7 }, (_, i) => ({
+      day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][(new Date().getDay() + i) % 7],
+      temp: (parseFloat(cur.temperature) || 32) + (i - 3) * 2,
+      humidity: (parseInt(cur.humidity, 10) || 65) + (i % 3) * 5,
+      rainfall: i === 2 || i === 5 ? (Math.random() * 5 + 1).toFixed(1) : 0,
+      condition: i % 3 === 0 ? 'Sunny' : i % 3 === 1 ? 'Partly Cloudy' : 'Cloudy'
+    }))
+  }
 
   return (
     <div className="dashboard">
@@ -187,7 +331,7 @@ function RuralFarmerDashboard() {
                 fill="#8884d8"
                 dataKey="emissions"
               >
-                {carbonFootprint.breakdown.map((entry, index) => (
+                {carbonFootprint.breakdown.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -315,11 +459,10 @@ function RuralFarmerDashboard() {
         </div>
       </div>
 
-      {/* Recommendations */}
+      {/* AI-Powered Recommendations */}
       <div className="section-card">
         <h3>💡 AI-Powered Recommendations</h3>
         
-        {/* AI Recommendation Form */}
         <div className="ai-form-container">
           <h4>Get Personalized AI Recommendations</h4>
           <form className="ai-form" onSubmit={(e) => { e.preventDefault(); getAIRecommendations(); }}>
@@ -389,6 +532,29 @@ function RuralFarmerDashboard() {
                     'Get AI Recommendations'
                   )}
                 </button>
+                <button
+                  type="button"
+                  className="ai-demo-btn"
+                  onClick={() => {
+                    setError(null)
+                    const mockRecs = MOCK_ORCHESTRATOR_RESPONSE.sustainabilityRecommendations?.map((rec, index) => ({
+                      id: `demo-${index + 1}`,
+                      title: rec.title,
+                      impact: `${rec.carbonReduction} tonnes CO₂e/year reduction`,
+                      cost: `₹${rec.investment?.toLocaleString('en-IN') ?? 0} initial investment`,
+                      savings: `₹${rec.annualSavings?.toLocaleString('en-IN') ?? 0}/year savings`,
+                      priority: (rec.priority || 'medium').toLowerCase(),
+                      description: rec.description,
+                      govtScheme: rec.govtScheme
+                    })) || []
+                    setAiRecommendations(mockRecs)
+                    setOrchestratorData(MOCK_ORCHESTRATOR_RESPONSE)
+                  }}
+                  title="Use when API is unavailable — loads sample Weather, Market & Recommendation data"
+                >
+                  Load demo data
+                </button>
+                <span className="demo-btn-hint">(Use when API is unavailable)</span>
               </div>
             </div>
           </form>
@@ -396,7 +562,6 @@ function RuralFarmerDashboard() {
           {error && <div className="error-message">{error}</div>}
         </div>
         
-        {/* Recommendations List */}
         <div className="recommendations-list">
           {displayRecommendations.map((rec, index) => (
             <div key={rec.id} className={`recommendation-card priority-${rec.priority}`}>
@@ -423,6 +588,234 @@ function RuralFarmerDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Weather Insights - shown when orchestrator returns data */}
+      {orchestratorData?.weatherInsights && (
+        <div className="section-card weather-section">
+          <h3>🌦️ Weather Insights & Farming Advice</h3>
+          
+          <div className="weather-current">
+            <h4>Current Conditions</h4>
+            <div className="weather-grid">
+              <div className="weather-stat">
+                <span className="weather-icon">🌡️</span>
+                <div className="weather-content">
+                  <span className="label">Temperature</span>
+                  <span className="value">{orchestratorData.weatherInsights.currentWeather?.temperature ?? '--'}°C</span>
+                </div>
+              </div>
+              <div className="weather-stat">
+                <span className="weather-icon">💧</span>
+                <div className="weather-content">
+                  <span className="label">Humidity</span>
+                  <span className="value">{orchestratorData.weatherInsights.currentWeather?.humidity ?? '--'}%</span>
+                </div>
+              </div>
+              <div className="weather-stat">
+                <span className="weather-icon">🌧️</span>
+                <div className="weather-content">
+                  <span className="label">Rainfall</span>
+                  <span className="value">{orchestratorData.weatherInsights.currentWeather?.rainfall ?? '--'} mm</span>
+                </div>
+              </div>
+              <div className="weather-stat">
+                <span className="weather-icon">☁️</span>
+                <div className="weather-content">
+                  <span className="label">Condition</span>
+                  <span className="value">{orchestratorData.weatherInsights.currentWeather?.condition ?? '--'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 7-Day Forecast Table */}
+          <div className="weather-forecast">
+            <h4>📅 7-Day Forecast</h4>
+            <table className="forecast-table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Temp (°C)</th>
+                  <th>Humidity</th>
+                  <th>Rainfall (mm)</th>
+                  <th>Condition</th>
+                </tr>
+              </thead>
+              <tbody>
+                {getForecastData().map((row, i) => (
+                  <tr key={i}>
+                    <td>{row.day}</td>
+                    <td>{row.temp}</td>
+                    <td>{typeof row.humidity === 'number' ? row.humidity : row.humidity}%</td>
+                    <td>{row.rainfall ?? 0}</td>
+                    <td>{row.condition ?? '--'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Weather Alerts with severity badges */}
+          {orchestratorData.weatherInsights.alerts && orchestratorData.weatherInsights.alerts.length > 0 && (
+            <div className="weather-alerts">
+              <h4>⚠️ Weather Alerts</h4>
+              {orchestratorData.weatherInsights.alerts.map((alert, i) => (
+                <div key={i} className={`alert-card ${getSeverityBadgeClass(alert.severity)}`}>
+                  <div className="alert-header">
+                    <span className="alert-type">{alert.type?.toUpperCase() ?? 'ALERT'}</span>
+                    <span className={`alert-severity severity-badge ${getSeverityBadgeClass(alert.severity)}`}>
+                      {alert.severity?.toUpperCase() ?? 'LOW'}
+                    </span>
+                  </div>
+                  <p className="alert-message">{alert.message}</p>
+                  <p className="alert-action"><strong>Action:</strong> {alert.action}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Farming Advice */}
+          {orchestratorData.weatherInsights.farmingAdvice && (
+            <div className="farming-advice">
+              <h4>🌾 Farming Advice</h4>
+              <div className="advice-grid">
+                <div className="advice-card">
+                  <span className="advice-icon">💧</span>
+                  <div className="advice-content">
+                    <h5>Irrigation</h5>
+                    <p>{orchestratorData.weatherInsights.farmingAdvice.irrigationRecommendation}</p>
+                  </div>
+                </div>
+                <div className="advice-card">
+                  <span className="advice-icon">🐛</span>
+                  <div className="advice-content">
+                    <h5>Pest Risk</h5>
+                    <p>{orchestratorData.weatherInsights.farmingAdvice.pestRisk}</p>
+                  </div>
+                </div>
+                <div className="advice-card">
+                  <span className="advice-icon">🌾</span>
+                  <div className="advice-content">
+                    <h5>Harvest Window</h5>
+                    <p>{orchestratorData.weatherInsights.farmingAdvice.harvestWindow}</p>
+                  </div>
+                </div>
+                <div className="advice-card">
+                  <span className="advice-icon">🌱</span>
+                  <div className="advice-content">
+                    <h5>Carbon Impact</h5>
+                    <p>{orchestratorData.weatherInsights.farmingAdvice.carbonImpact}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Market Intelligence - shown when orchestrator returns data */}
+      {orchestratorData?.marketInsights && (
+        <div className="section-card market-section">
+          <h3>💰 Market Intelligence</h3>
+          
+          {/* Mandi Prices Table */}
+          <div className="market-prices">
+            <h4>📊 Mandi Prices</h4>
+            <table className="mandi-table">
+              <thead>
+                <tr>
+                  <th>Crop</th>
+                  <th>Current Price (₹/q)</th>
+                  <th>MSP (₹/q)</th>
+                  <th>Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{formData.primaryCrop}</td>
+                  <td>₹{orchestratorData.marketInsights.mandiPrices?.currentPrice ?? '--'}</td>
+                  <td>₹{orchestratorData.marketInsights.mandiPrices?.mspPrice ?? '--'}</td>
+                  <td>
+                    <span className={`trend-badge trend-${(orchestratorData.marketInsights.mandiPrices?.priceTrend ?? 'STABLE').toLowerCase()}`}>
+                      {orchestratorData.marketInsights.mandiPrices?.priceTrend ?? 'STABLE'}
+                      {(orchestratorData.marketInsights.mandiPrices?.priceTrend ?? '') === 'RISING' && ' ↑'}
+                      {(orchestratorData.marketInsights.mandiPrices?.priceTrend ?? '') === 'FALLING' && ' ↓'}
+                      {(orchestratorData.marketInsights.mandiPrices?.priceTrend ?? '') === 'STABLE' && ' →'}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            {orchestratorData.marketInsights.mandiPrices?.nearestMandi && (
+              <p className="mandi-note">Nearest Mandi: {orchestratorData.marketInsights.mandiPrices.nearestMandi}</p>
+            )}
+          </div>
+
+          {/* Carbon Credits */}
+          <div className="carbon-credits-market">
+            <h4>🌍 Carbon Credits</h4>
+            <div className="carbon-grid">
+              <div className="carbon-stat">
+                <span className="label">Price per Tonne</span>
+                <span className="value">₹{orchestratorData.marketInsights.carbonCredits?.currentPricePerTonne ?? '--'}</span>
+              </div>
+              <div className="carbon-stat highlight">
+                <span className="label">Estimated Earnings</span>
+                <span className="value-large">₹{(orchestratorData.marketInsights.carbonCredits?.estimatedEarnings ?? 0).toLocaleString('en-IN')}</span>
+              </div>
+              <div className="carbon-stat">
+                <span className="label">Scheme</span>
+                <span className="value">{orchestratorData.marketInsights.carbonCredits?.registrationScheme ?? '--'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Market Advice (SELL_NOW / WAIT / PARTIAL_SELL) */}
+          {orchestratorData.marketInsights.marketAdvice && (
+            <div className="market-advice">
+              <h4>📊 Market Recommendation</h4>
+              <div className={`advice-box recommendation-${(orchestratorData.marketInsights.marketAdvice.sellNowOrWait ?? 'WAIT').toLowerCase()}`}>
+                <div className="advice-decision">
+                  <span className="decision-label">Decision:</span>
+                  <span className="decision-value">{orchestratorData.marketInsights.marketAdvice.sellNowOrWait?.replace(/_/g, ' ') ?? 'WAIT'}</span>
+                </div>
+                <p className="advice-reasoning">{orchestratorData.marketInsights.marketAdvice.reasoning}</p>
+                
+                {orchestratorData.marketInsights.marketAdvice.alternativeMarkets?.length > 0 && (
+                  <div className="alternative-markets">
+                    <strong>Alternative Markets:</strong>
+                    <ul>
+                      {orchestratorData.marketInsights.marketAdvice.alternativeMarkets.map((market, i) => (
+                        <li key={i}>{market}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {orchestratorData.marketInsights.marketAdvice.govtSchemes?.length > 0 && (
+                  <div className="govt-schemes">
+                    <strong>Relevant Government Schemes:</strong>
+                    <ul>
+                      {orchestratorData.marketInsights.marketAdvice.govtSchemes.map((scheme, i) => (
+                        <li key={i}>{scheme}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Total Potential Income */}
+          <div className="total-income">
+            <h4>💵 Total Potential Income</h4>
+            <div className="income-value">
+              ₹{(orchestratorData.marketInsights.totalPotentialIncome ?? 0).toLocaleString('en-IN')}
+            </div>
+            <p className="income-note">Includes crop sales + carbon credit earnings</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
