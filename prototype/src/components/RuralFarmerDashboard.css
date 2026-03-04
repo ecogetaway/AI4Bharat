@@ -693,34 +693,41 @@
   color: white;
 }
 
-.weather-section h3,
+.weather-section h3 {
+  color: white;
+  font-size: 1.35rem;
+}
+
 .weather-section h4 {
   color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
 .weather-current {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .weather-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .weather-stat {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   backdrop-filter: blur(10px);
 }
 
 .weather-icon {
-  font-size: 2rem;
+  font-size: 1.75rem;
 }
 
 .weather-content {
@@ -730,38 +737,47 @@
 }
 
 .weather-content .label {
-  font-size: 0.85rem;
-  opacity: 0.9;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
 }
 
 .weather-content .value {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: bold;
+  color: #2d2d2d;
 }
 
 /* 7-Day Forecast Table */
 .weather-forecast {
-  margin: 2rem 0;
+  margin: 1rem 0;
 }
 
 .forecast-table {
   width: 100%;
   border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   overflow: hidden;
 }
 
 .forecast-table th,
 .forecast-table td {
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 1rem;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .forecast-table th {
-  background: rgba(0, 0, 0, 0.2);
-  font-weight: 600;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.forecast-table td {
+  color: #1a1a2e;
+  font-weight: 500;
 }
 
 .forecast-table tbody tr:hover {
@@ -770,12 +786,12 @@
 
 /* Weather Alerts */
 .weather-alerts {
-  margin: 2rem 0;
+  margin: 1rem 0;
 }
 
 .alert-card {
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
   border-radius: 12px;
   border-left: 4px solid;
   background: rgba(255, 255, 255, 0.95);
@@ -848,39 +864,41 @@
 
 /* Farming Advice */
 .farming-advice {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .advice-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .advice-card {
   display: flex;
   gap: 1rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   backdrop-filter: blur(10px);
 }
 
 .advice-icon {
-  font-size: 2rem;
+  font-size: 1.75rem;
 }
 
 .advice-content h5 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  color: #ffd700;
+  margin: 0 0 0.35rem 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a2e;
 }
 
 .advice-content p {
   margin: 0;
   line-height: 1.5;
   font-size: 0.9rem;
+  color: #2d2d2d;
 }
 
 /* Market Section Styles */
