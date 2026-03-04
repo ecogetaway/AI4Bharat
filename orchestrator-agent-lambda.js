@@ -291,12 +291,9 @@ export const handler = async (event) => {
   const requestId = crypto.randomUUID();
   log("info", "Orchestrator Agent invoked", { requestId });
   
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json"
-  };
+  // CORS is handled by Lambda Function URL config - do NOT add CORS headers here
+  // or you get duplicate "Access-Control-Allow-Origin: *, *" which browsers reject
+  const headers = { "Content-Type": "application/json" };
 
   if (event.requestContext?.http?.method === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
