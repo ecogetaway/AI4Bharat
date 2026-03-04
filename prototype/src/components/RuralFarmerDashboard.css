@@ -895,7 +895,7 @@
 }
 
 .market-prices {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .mandi-table {
@@ -1030,8 +1030,8 @@
 
 /* Carbon Credits Market */
 .carbon-credits-market {
-  margin: 2rem 0;
-  padding: 1.5rem;
+  margin: 1rem 0;
+  padding: 1rem 1.5rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   backdrop-filter: blur(10px);
@@ -1041,7 +1041,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
 }
 
 .carbon-stat {
@@ -1091,7 +1091,7 @@
 
 /* Market Advice */
 .market-advice {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .advice-box {
@@ -1163,8 +1163,8 @@
 
 /* Total Income */
 .total-income {
-  margin-top: 2rem;
-  padding: 2rem;
+  margin-top: 1rem;
+  padding: 1.5rem;
   background: rgba(255, 215, 0, 0.2);
   border-radius: 16px;
   text-align: center;
