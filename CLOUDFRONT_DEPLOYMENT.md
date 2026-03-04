@@ -1,118 +1,147 @@
-# AI4Bharat - CloudFront Deployment Guide
+# AI4Bharat - CloudFront Deployment Guide (AWS Console Only)
 
-Deploy the frontend to **AWS S3 + CloudFront** for global CDN delivery and low-latency access (especially useful for rural areas).
+Deploy the frontend to **AWS S3 + CloudFront** using only the AWS web console—no CLI required.
 
 ## Prerequisites
 
-- AWS CLI configured (`aws configure`)
+- AWS account
 - Build output in `prototype/dist/`
 
 ---
 
-## Option A: One-Time Manual Setup
+## Step 1: Build the App
 
-### Step 1: Build the App
+On your computer, in a terminal:
 
 ```bash
 cd prototype
 npm run build
 ```
 
-### Step 2: Create S3 Bucket
+This creates the `dist/` folder with your built app.
 
-```bash
-# Replace ai4bharat-your-unique-id with a globally unique bucket name
-BUCKET_NAME=ai4bharat-frontend-$(date +%s)
+---
 
-aws s3 mb s3://$BUCKET_NAME --region us-east-1
+## Step 2: Create S3 Bucket
 
-# Enable static website hosting
-aws s3 website s3://$BUCKET_NAME \
-  --index-document index.html \
-  --error-document index.html
-```
+1. Go to [AWS Console](https://console.aws.amazon.com) → **S3**
+2. Click **Create bucket**
+3. **Bucket name:** `ai4bharat-frontend` (or any unique name like `ai4bharat-frontend-12345`)
+4. **Region:** `us-east-1` (N. Virginia)
+5. **Block Public Access:** Uncheck **Block all public access** (we need public read for the website)
+6. Acknowledge the warning
+7. Click **Create bucket**
 
-### Step 3: Upload Build to S3
+---
 
-```bash
-cd prototype
-aws s3 sync dist/ s3://$BUCKET_NAME --delete
-```
+## Step 3: Enable Static Website Hosting
 
-### Step 4: Create CloudFront Distribution
+1. Open your bucket → **Properties** tab
+2. Scroll to **Static website hosting** → **Edit**
+3. Select **Enable**
+4. **Index document:** `index.html`
+5. **Error document:** `index.html` (required for React Router)
+6. Click **Save changes**
 
-1. Go to **AWS Console** → **CloudFront** → **Create distribution**
+---
+
+## Step 4: Upload Build Files to S3
+
+1. Open your bucket → **Objects** tab
+2. Click **Upload**
+3. Click **Add files** and select **all files** from `prototype/dist/`:
+   - `index.html` (in dist root)
+   - Everything inside `dist/assets/` (JS, CSS, images)
+4. Click **Upload**
+5. Wait for upload to complete
+
+---
+
+## Step 5: Create CloudFront Distribution
+
+1. Go to [CloudFront](https://console.aws.amazon.com/cloudfront) → **Create distribution**
+
 2. **Origin settings:**
-   - Origin domain: Select your S3 bucket (`$BUCKET_NAME.s3.us-east-1.amazonaws.com`)
-   - Origin access: **Origin access control (recommended)** → Create new OAC
-   - Or use **Legacy access identities** if OAC is not available
+   - **Origin domain:** Choose your S3 bucket from the dropdown (e.g. `ai4bharat-frontend.s3.us-east-1.amazonaws.com`)
+   - **Origin access:** Select **Origin access control settings (recommended)**
+   - Click **Create control setting** → keep defaults → **Create**
+   - **Name:** leave default
+
 3. **Default cache behavior:**
-   - Viewer protocol policy: **Redirect HTTP to HTTPS**
-   - Allowed HTTP methods: **GET, HEAD, OPTIONS**
-   - Cache policy: **CachingOptimized** (or CachingDisabled for dev)
-4. **Error pages** (required for React Router SPA):
-   - Add custom error response:
-     - HTTP error code: **403**
-     - Response page path: **/index.html**
-     - HTTP response code: **200**
-   - Add another for **404** → `/index.html` → 200
-5. **Create distribution**
+   - **Viewer protocol policy:** Redirect HTTP to HTTPS
+   - **Allowed HTTP methods:** GET, HEAD, OPTIONS
+   - **Cache policy:** CachingOptimized
 
-### Step 5: Update S3 Bucket Policy (if using OAC)
+4. **Settings:**
+   - **Price class:** Use only North America and Europe (cheaper) or Use all edge locations
 
-After creating the distribution, CloudFront will show a banner with a policy to copy. Apply it:
+5. Click **Create distribution**
 
-```bash
-# Get the policy from CloudFront console, then:
-aws s3api put-bucket-policy --bucket $BUCKET_NAME --policy file://bucket-policy.json
-```
-
-### Step 6: Get Your URL
-
-CloudFront URL: `https://d1234abcd.cloudfront.net` (from the distribution details)
+6. **Important:** A yellow banner will appear: *"The S3 bucket policy needs to be updated"*. Click **Copy policy** — you’ll use this in Step 6.
 
 ---
 
-## Option B: Deploy Script (After Initial Setup)
+## Step 6: Update S3 Bucket Policy
 
-```bash
-# From project root
-./deploy-cloudfront.sh
-```
+1. Go back to **S3** → your bucket → **Permissions** tab
+2. Scroll to **Bucket policy** → **Edit**
+3. Paste the policy you copied from CloudFront (replace any existing policy)
+4. Update the bucket name in the policy if it says `"Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"` — replace `YOUR-BUCKET-NAME` with your actual bucket name
+5. Click **Save changes**
 
 ---
 
-## SPA Routing (React Router)
+## Step 7: Add Error Pages (for React Router)
 
-For client-side routing to work, CloudFront must return `index.html` for 404/403 errors. This is configured in Step 4 above.
+1. Go to **CloudFront** → your distribution → **Error pages** tab
+2. Click **Create custom error response**
+
+   **First error:**
+   - **HTTP error code:** 403
+   - **Customize error response:** Yes
+   - **Response page path:** `/index.html`
+   - **HTTP response code:** 200
+   - Click **Save**
+
+   **Second error:**
+   - Click **Create custom error response** again
+   - **HTTP error code:** 404
+   - **Customize error response:** Yes
+   - **Response page path:** `/index.html`
+   - **HTTP response code:** 200
+   - Click **Save**
+
+---
+
+## Step 8: Get Your URL
+
+1. In CloudFront → your distribution
+2. Copy the **Distribution domain name** (e.g. `d1234abcd.cloudfront.net`)
+3. Your site is live at: **https://d1234abcd.cloudfront.net**
+
+It may take 5–10 minutes for the first deployment to propagate.
+
+---
+
+## Re-deploying (When You Push Changes)
+
+1. **Build:** `cd prototype && npm run build`
+2. **Upload:** In S3 → your bucket → **Objects** → select all files → **Delete**
+3. **Upload:** Click **Upload** → add all files from `prototype/dist/` again
+4. **Invalidate cache:** In CloudFront → your distribution → **Invalidations** tab → **Create invalidation** → enter `/*` → **Create**
 
 ---
 
 ## Custom Domain (Optional)
 
-1. In CloudFront distribution → **General** → **Edit** → Add custom domain (e.g. `app.ai4bharat.in`)
+1. CloudFront → your distribution → **General** → **Edit** → add your domain under **Alternate domain names (CNAMEs)**
 2. Request an ACM certificate in **us-east-1** for your domain
-3. Add the CNAME record to your DNS pointing to the CloudFront domain
-
----
-
-## Re-deploying
-
-After pushing changes to GitHub:
-
-```bash
-cd prototype
-npm run build
-aws s3 sync dist/ s3://YOUR_BUCKET_NAME --delete
-aws cloudfront create-invalidation --distribution-id YOUR_DIST_ID --paths "/*"
-```
-
-The invalidation ensures users get the latest build within 1–2 minutes.
+3. Add a CNAME record in your DNS pointing to the CloudFront domain
 
 ---
 
 ## Cost Estimate
 
-- **S3**: ~$0.023/GB storage + minimal request costs
-- **CloudFront**: ~$0.085/GB for first 10TB (free tier: 1TB/month for 12 months)
-- **Typical**: ~$1–5/month for a low-traffic site
+- **S3:** ~$0.023/GB storage
+- **CloudFront:** ~$0.085/GB (free tier: 1TB/month for 12 months)
+- **Typical:** ~$1–5/month for a low-traffic site

@@ -28,6 +28,7 @@ function CooperativeAggregationView() {
         <div className="header-content">
           <h2>🤝 {cooperativeName}</h2>
           <p className="coop-info">📍 {location}</p>
+          <p className="vernacular-tagline">आमची माती आमची माणसं</p>
         </div>
         <div className="header-stats-cards">
           <div className="stat-card-large">

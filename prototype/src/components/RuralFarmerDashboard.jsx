@@ -262,6 +262,7 @@ function RuralFarmerDashboard() {
           <div className="farmer-info">
             <h2 className="farmer-name">{farmerName}</h2>
             <p className="location">📍 {location} | {farmSize} hectares</p>
+            <p className="vernacular-tagline">आमची माती आमची माणसं</p>
           </div>
         </div>
         <div className="header-stats">
