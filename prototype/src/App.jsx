@@ -4,6 +4,7 @@ import RuralFarmerDashboard from './components/RuralFarmerDashboard'
 import EmissionHotspotView from './components/EmissionHotspotView'
 import CooperativeAggregationView from './components/CooperativeAggregationView'
 import './App.css'
+import CostDashboard from './components/CostDashboard'
 
 function App() {
   const [activeView, setActiveView] = useState('farmer')
@@ -50,6 +51,7 @@ function App() {
           </Routes>
         </main>
 
+        <CostDashboard />
         <footer className="app-footer">
           <p>AI4Bharat Hackathon 2026 | Rural Innovation & Sustainable Systems | Built with React + Vite</p>
         </footer>
