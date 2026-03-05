@@ -460,6 +460,156 @@ function RuralFarmerDashboard() {
         </div>
       </div>
 
+      {/* Seed Intelligence */}
+      <div className="section-card seed-section">
+        <h3>🌱 Seed Intelligence — Seed Sovereignty & Carbon Impact</h3>
+        <p className="seed-intro">Seed choice directly affects your carbon footprint, input costs, and carbon credit eligibility. Indigenous seeds can reduce input costs by 20–50% and earn more carbon credits.</p>
+
+        <div className="seed-comparison-grid">
+          {/* Hybrid/Monsanto */}
+          <div className="seed-card seed-card--hybrid">
+            <div className="seed-card-header">
+              <span className="seed-type-badge badge-hybrid">⚠️ Current: Hybrid / Commercial</span>
+            </div>
+            <div className="seed-stats">
+              <div className="seed-stat">
+                <span className="label">Example</span>
+                <span className="value">BT Cotton (Monsanto), HYV Rice</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Carbon Intensity</span>
+                <span className="value danger-text">2.8 kg CO₂e / kg seed</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Fertilizer Dependency</span>
+                <span className="value danger-text">HIGH — requires chemical inputs</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Annual Seed Cost</span>
+                <span className="value danger-text">₹8,000 – ₹18,000 / season</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Carbon Credits Eligible</span>
+                <span className="value danger-text">LOW — high input dependency</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Farmer Control</span>
+                <span className="value danger-text">❌ Cannot save / replant seeds</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Arrow */}
+          <div className="seed-arrow">→</div>
+
+          {/* Indigenous / Desi */}
+          <div className="seed-card seed-card--indigenous">
+            <div className="seed-card-header">
+              <span className="seed-type-badge badge-indigenous">✅ Recommended: Indigenous / Desi</span>
+            </div>
+            <div className="seed-stats">
+              <div className="seed-stat">
+                <span className="label">Example</span>
+                <span className="value">Desi Kapas, Sahbhagi Dhan, Joha Rice</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Carbon Intensity</span>
+                <span className="value success-text">0.9 kg CO₂e / kg seed (-68%)</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Fertilizer Dependency</span>
+                <span className="value success-text">LOW — thrives with organic inputs</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Annual Seed Cost</span>
+                <span className="value success-text">₹500 – ₹2,000 or FREE (farm-saved)</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Carbon Credits Eligible</span>
+                <span className="value success-text">HIGH — low-input farming qualifies</span>
+              </div>
+              <div className="seed-stat">
+                <span className="label">Farmer Control</span>
+                <span className="value success-text">✅ Save, replant & share seeds</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Seed Saving Potential */}
+        <div className="seed-impact-row">
+          <div className="seed-impact-card">
+            <span className="impact-icon">💰</span>
+            <div className="impact-content">
+              <span className="impact-label">Input Cost Saving</span>
+              <span className="impact-value success-text">₹12,000 – ₹20,000/year</span>
+              <span className="impact-sub">Seed + reduced fertilizer costs</span>
+            </div>
+          </div>
+          <div className="seed-impact-card">
+            <span className="impact-icon">🌍</span>
+            <div className="impact-content">
+              <span className="impact-label">Carbon Reduction</span>
+              <span className="impact-value success-text">1.2 tonnes CO₂e/year</span>
+              <span className="impact-sub">From lower input dependency</span>
+            </div>
+          </div>
+          <div className="seed-impact-card">
+            <span className="impact-icon">₹</span>
+            <div className="impact-content">
+              <span className="impact-label">Extra Carbon Credits</span>
+              <span className="impact-value success-text">₹3,600/year</span>
+              <span className="impact-sub">Additional credits from transition</span>
+            </div>
+          </div>
+          <div className="seed-impact-card">
+            <span className="impact-icon">🏛️</span>
+            <div className="impact-content">
+              <span className="impact-label">Govt Scheme</span>
+              <span className="impact-value">NMAE + PPV&FRA</span>
+              <span className="impact-sub">Seed sovereignty protection</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Seed Sources */}
+        <div className="seed-sources">
+          <h4>📍 Nearest Seed Sources — Nashik District</h4>
+          <div className="seed-sources-grid">
+            <div className="seed-source-card">
+              <span className="source-icon">🏛️</span>
+              <div className="source-content">
+                <strong>NBPGR Regional Station</strong>
+                <p>National Bureau of Plant Genetic Resources</p>
+                <p className="source-detail">Indigenous variety catalog — 200+ drought-tolerant varieties for Maharashtra</p>
+              </div>
+            </div>
+            <div className="seed-source-card">
+              <span className="source-icon">🤝</span>
+              <div className="source-content">
+                <strong>Beej Swaraj Network</strong>
+                <p>Community Seed Bank, Nashik</p>
+                <p className="source-detail">Free indigenous seeds for registered cooperative members — 47 varieties available</p>
+              </div>
+            </div>
+            <div className="seed-source-card">
+              <span className="source-icon">🔬</span>
+              <div className="source-content">
+                <strong>ICAR — Agri Research Station</strong>
+                <p>Igatpuri, Nashik District</p>
+                <p className="source-detail">Low-carbon seed trials for grapes, rice & pulses — open to FPO members</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="seed-cta">
+          <p className="seed-cta-text">
+            🌾 <strong>Beej Swaraj</strong> (बीज स्वराज) — Seed Sovereignty. Your right to save, share and replant your own seeds. Less carbon. More independence. Better margins.
+          </p>
+        </div>
+      </div>
+
       {/* AI-Powered Recommendations */}
       <div className="section-card">
         <h3>💡 AI-Powered Recommendations</h3>

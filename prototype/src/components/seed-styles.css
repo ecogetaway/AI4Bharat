@@ -1,0 +1,97 @@
+/* ── Seed Intelligence Section ── */
+.seed-section { margin-top: 1.5rem; }
+.seed-intro { color: #555; font-size: 0.95rem; margin-bottom: 1.2rem; line-height: 1.6; }
+
+.seed-comparison-grid {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
+}
+
+.seed-card {
+  flex: 1;
+  border-radius: 10px;
+  padding: 1.2rem;
+  border: 2px solid #eee;
+}
+.seed-card--hybrid { background: #fff5f5; border-color: #ffcdd2; }
+.seed-card--indigenous { background: #f0faf4; border-color: #a5d6a7; }
+
+.seed-card-header { margin-bottom: 1rem; }
+.seed-type-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.badge-hybrid { background: #ffebee; color: #c62828; }
+.badge-indigenous { background: #e8f5e9; color: #2e7d32; }
+
+.seed-stats { display: flex; flex-direction: column; gap: 0.6rem; }
+.seed-stat { display: flex; justify-content: space-between; align-items: flex-start; font-size: 0.88rem; border-bottom: 1px solid #eee; padding-bottom: 0.4rem; gap: 0.5rem; }
+.seed-stat .label { color: #777; min-width: 140px; }
+.seed-stat .value { font-weight: 600; text-align: right; }
+
+.seed-arrow {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  color: #2e7d32;
+  font-weight: bold;
+  padding: 0 0.5rem;
+}
+
+.seed-impact-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.seed-impact-card {
+  background: #f8faf9;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  border: 1px solid #e0f0e8;
+}
+.impact-icon { font-size: 1.5rem; }
+.impact-content { display: flex; flex-direction: column; }
+.impact-label { font-size: 0.78rem; color: #777; }
+.impact-value { font-size: 1rem; font-weight: 700; margin: 0.1rem 0; }
+.impact-sub { font-size: 0.75rem; color: #888; }
+
+.seed-sources h4 { margin-bottom: 0.8rem; color: #2e7d32; }
+.seed-sources-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.2rem; }
+.seed-source-card {
+  background: #fff;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.7rem;
+}
+.source-icon { font-size: 1.5rem; }
+.source-content strong { font-size: 0.9rem; color: #1b5e20; }
+.source-content p { font-size: 0.82rem; color: #555; margin: 0.2rem 0 0; }
+.source-detail { font-size: 0.78rem; color: #777; margin-top: 0.3rem !important; }
+
+.seed-cta {
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  border-left: 4px solid #2e7d32;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+}
+.seed-cta-text { margin: 0; font-size: 0.92rem; color: #2e7d32; line-height: 1.6; }
+
+.danger-text { color: #c62828 !important; }
+
+@media (max-width: 768px) {
+  .seed-comparison-grid { flex-direction: column; }
+  .seed-arrow { transform: rotate(90deg); text-align: center; }
+  .seed-impact-row { grid-template-columns: repeat(2, 1fr); }
+  .seed-sources-grid { grid-template-columns: 1fr; }
+}
