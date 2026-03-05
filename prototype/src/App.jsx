@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import RuralFarmerDashboard from './components/RuralFarmerDashboard'
 import EmissionHotspotView from './components/EmissionHotspotView'
 import CooperativeAggregationView from './components/CooperativeAggregationView'
-import './App.css'
 import CostDashboard from './components/CostDashboard'
+import './App.css'
 
 function App() {
   const [activeView, setActiveView] = useState('farmer')
@@ -41,6 +41,13 @@ function App() {
           >
             🤝 Cooperative View
           </Link>
+          <Link 
+            to="/admin" 
+            className={`nav-link ${activeView === 'admin' ? 'active' : ''}`}
+            onClick={() => setActiveView('admin')}
+          >
+            📊 Platform Intelligence
+          </Link>
         </nav>
 
         <main className="app-main">
@@ -48,10 +55,10 @@ function App() {
             <Route path="/" element={<RuralFarmerDashboard />} />
             <Route path="/hotspots" element={<EmissionHotspotView />} />
             <Route path="/cooperative" element={<CooperativeAggregationView />} />
+            <Route path="/admin" element={<CostDashboard />} />
           </Routes>
         </main>
 
-        <CostDashboard />
         <footer className="app-footer">
           <p>AI4Bharat Hackathon 2026 | Rural Innovation & Sustainable Systems | Built with React + Vite</p>
         </footer>
