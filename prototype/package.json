@@ -8,7 +8,9 @@
     "preview": "vite preview",
     "test": "playwright test",
     "test:e2e": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "test:production": "playwright test --config=playwright.config.production.js",
+    "test:production:report": "playwright test --config=playwright.config.production.js --reporter=html && playwright show-report"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.1000.0",
