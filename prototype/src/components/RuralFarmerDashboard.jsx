@@ -9,7 +9,182 @@ const COLORS = ['#ef5350', '#ff7043', '#ffa726', '#66bb6a', '#42a5f5']
 const RECOMMENDATIONS_API_URL = 'https://6qg6qznso7.execute-api.ap-south-1.amazonaws.com/recommendations'
 const ORCHESTRATOR_URL = 'https://gylv2iabjpsbte727qkawailjm0xnctf.lambda-url.us-east-1.on.aws/'
 
-// Fallback mock data when orchestrator API fails (for demo/development)
+// Dynamic mock data generator based on form inputs
+const generateMockResponse = (formData) => {
+  // Crop-specific MSP and market prices (realistic Indian agriculture data)
+  const cropData = {
+    'Rice': { msp: 2183, currentPrice: 2473, trend: 'RISING', carbonPerHa: 2.4 },
+    'Wheat': { msp: 2275, currentPrice: 2520, trend: 'STABLE', carbonPerHa: 2.1 },
+    'Cotton': { msp: 6620, currentPrice: 7100, trend: 'RISING', carbonPerHa: 3.2 },
+    'Sugarcane': { msp: 315, currentPrice: 340, trend: 'STABLE', carbonPerHa: 4.5 },
+    'Pulses': { msp: 7000, currentPrice: 7850, trend: 'RISING', carbonPerHa: 1.8 },
+    'Vegetables': { msp: 1500, currentPrice: 1820, trend: 'RISING', carbonPerHa: 2.0 },
+    'Fruits': { msp: 2300, currentPrice: 2473, trend: 'RISING', carbonPerHa: 2.2 }
+  }
+
+  const crop = cropData[formData.primaryCrop] || cropData['Rice']
+  const farmSize = parseFloat(formData.farmSize) || 5
+  
+  // Calculate carbon reduction based on practices
+  let carbonReduction = 0
+  let recommendations = []
+  
+  // Fertilizer recommendations
+  if (formData.fertilizerType === 'Chemical') {
+    carbonReduction += 2.1
+    recommendations.push({
+      title: 'Switch to Bio-Fertilizers',
+      carbonReduction: 2.1,
+      investment: 8500,
+      annualSavings: 12000,
+      priority: 'high',
+      description: 'Reduce chemical fertilizer emissions',
+      govtScheme: 'PM-KUSUM'
+    })
+  } else if (formData.fertilizerType === 'Mixed') {
+    carbonReduction += 1.2
+    recommendations.push({
+      title: 'Transition to Organic Fertilizers',
+      carbonReduction: 1.2,
+      investment: 5000,
+      annualSavings: 8000,
+      priority: 'medium',
+      description: 'Complete transition to organic',
+      govtScheme: 'Paramparagat Krishi Vikas Yojana'
+    })
+  }
+  
+  // Irrigation recommendations
+  if (formData.irrigationMethod === 'Flood') {
+    carbonReduction += 1.5
+    recommendations.push({
+      title: 'Install Drip Irrigation',
+      carbonReduction: 1.5,
+      investment: 45000,
+      annualSavings: 18000,
+      priority: 'high',
+      description: 'Save water and reduce emissions',
+      govtScheme: 'Per Drop More Crop'
+    })
+  } else if (formData.irrigationMethod === 'Sprinkler') {
+    carbonReduction += 0.8
+    recommendations.push({
+      title: 'Upgrade to Drip Irrigation',
+      carbonReduction: 0.8,
+      investment: 25000,
+      annualSavings: 12000,
+      priority: 'medium',
+      description: 'Further optimize water use',
+      govtScheme: 'Per Drop More Crop'
+    })
+  }
+  
+  // Pesticide recommendations
+  if (formData.pesticideUsage === 'High') {
+    carbonReduction += 1.2
+    recommendations.push({
+      title: 'Adopt Integrated Pest Management',
+      carbonReduction: 1.2,
+      investment: 3000,
+      annualSavings: 7000,
+      priority: 'high',
+      description: 'Reduce pesticide use by 60%',
+      govtScheme: 'National Mission on Sustainable Agriculture'
+    })
+  } else if (formData.pesticideUsage === 'Medium') {
+    carbonReduction += 0.6
+    recommendations.push({
+      title: 'Implement Bio-Pesticides',
+      carbonReduction: 0.6,
+      investment: 2000,
+      annualSavings: 4000,
+      priority: 'medium',
+      description: 'Switch to organic pest control',
+      govtScheme: 'National Mission on Sustainable Agriculture'
+    })
+  }
+  
+  // Always add cover cropping if not already optimal
+  if (recommendations.length < 3) {
+    recommendations.push({
+      title: 'Adopt Cover Cropping',
+      carbonReduction: 0.8,
+      investment: 3000,
+      annualSavings: 5400,
+      priority: 'medium',
+      description: 'Increase soil carbon sequestration',
+      govtScheme: 'Soil Health Card Scheme'
+    })
+  }
+  
+  // Calculate carbon credits
+  const totalCarbonReduction = carbonReduction * farmSize
+  const carbonCreditValue = Math.round(totalCarbonReduction * 3000)
+  
+  // Determine sell decision
+  const priceAboveMSP = crop.currentPrice > crop.msp
+  const sellDecision = priceAboveMSP && crop.trend === 'RISING' ? 'SELL_NOW' : 
+                       priceAboveMSP ? 'SELL_NOW' : 'WAIT'
+  
+  const reasoning = `The current Mandi price of Rs ${crop.currentPrice} per quintal is ${priceAboveMSP ? 'higher' : 'lower'} than the Minimum Support Price (MSP) of Rs ${crop.msp} per quintal. Given the ${crop.trend.toLowerCase()} price trend, ${sellDecision === 'SELL_NOW' ? 'selling now will maximize the revenue' : 'it is advisable to wait for better prices'}. Additionally, considering the potential earnings from carbon credits (Rs ${carbonCreditValue}), it is financially prudent to ${sellDecision === 'SELL_NOW' ? 'sell the produce immediately' : 'monitor market conditions closely'}.`
+  
+  return {
+    sustainabilityRecommendations: recommendations.slice(0, 3),
+    weatherInsights: {
+      currentWeather: { 
+        temperature: 28 + Math.floor(Math.random() * 8), 
+        humidity: 55 + Math.floor(Math.random() * 20), 
+        rainfall: 0, 
+        condition: 'Partly Cloudy' 
+      },
+      forecast: Array.from({ length: 7 }, (_, i) => ({
+        day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][(new Date().getDay() + i) % 7],
+        temp: 28 + Math.floor(Math.random() * 8),
+        humidity: 55 + Math.floor(Math.random() * 20),
+        rainfall: i === 3 || i === 4 ? Math.floor(Math.random() * 5) : 0,
+        condition: i === 3 || i === 4 ? 'Rain' : 'Partly Cloudy'
+      })),
+      alerts: [
+        { type: 'Temperature', severity: 'MEDIUM', message: 'Moderate temperature expected', action: 'Monitor crop health' },
+        ...(Math.random() > 0.5 ? [{ type: 'Rain', severity: 'MEDIUM', message: 'Rain forecast mid-week', action: 'Delay irrigation' }] : [])
+      ],
+      farmingAdvice: {
+        irrigationRecommendation: formData.irrigationMethod === 'Flood' 
+          ? 'Consider switching to drip irrigation for water efficiency and emission reduction.'
+          : 'Current irrigation method is efficient. Monitor soil moisture levels.',
+        pestRisk: formData.pesticideUsage === 'High' 
+          ? 'High pesticide use detected. Consider integrated pest management to reduce costs and emissions.'
+          : 'Moderate pest risk. Continue current practices with regular monitoring.',
+        harvestWindow: `Optimal harvest window: 2-3 weeks from now based on ${formData.primaryCrop} maturity cycle.`,
+        carbonImpact: `Current practices generate approximately ${(crop.carbonPerHa * farmSize).toFixed(1)} tonnes CO₂e/year. Implementing recommendations can reduce this by ${carbonReduction.toFixed(1)} tonnes/hectare.`
+      }
+    },
+    marketInsights: {
+      mandiPrices: {
+        currentPrice: crop.currentPrice,
+        mspPrice: crop.msp,
+        nearestMandi: 'Nashik APMC',
+        priceTrend: crop.trend,
+        bestSellingWindow: sellDecision === 'SELL_NOW' ? 'Next 2 weeks' : 'Wait 3-4 weeks'
+      },
+      carbonCredits: {
+        currentPricePerTonne: 3000,
+        estimatedEarnings: carbonCreditValue,
+        registrationScheme: 'India Carbon Market (proposed)',
+        verificationRequired: 'Third-party verification needed'
+      },
+      marketAdvice: {
+        sellNowOrWait: sellDecision,
+        reasoning: reasoning,
+        alternativeMarkets: ['Pune APMC', 'Mumbai Agri-Produce Market Committee (APMC)', 'Surat APMC'],
+        govtSchemes: ['Pradhan Mantri Fasal Bima Yojana (PMFBY)', 'PM-AASHA', 'e-NAM']
+      },
+      totalPotentialIncome: Math.round(crop.currentPrice * farmSize * 25 + carbonCreditValue)
+    }
+  }
+}
+
+// Static fallback for initial load (kept for backward compatibility)
 const MOCK_ORCHESTRATOR_RESPONSE = {
   sustainabilityRecommendations: [
     { title: 'Switch to Bio-Fertilizers', carbonReduction: 2.1, investment: 8500, annualSavings: 12000, priority: 'high', description: 'Reduce emissions', govtScheme: 'PM-KUSUM' },
@@ -39,7 +214,7 @@ const MOCK_ORCHESTRATOR_RESPONSE = {
   },
   marketInsights: {
     mandiPrices: {
-      currentPrice: 2850,
+      currentPrice: 2473,
       mspPrice: 2183,
       nearestMandi: 'Nashik APMC',
       priceTrend: 'RISING',
@@ -53,9 +228,9 @@ const MOCK_ORCHESTRATOR_RESPONSE = {
     },
     marketAdvice: {
       sellNowOrWait: 'SELL_NOW',
-      reasoning: 'Current prices above MSP. Market trend rising. Good window to sell before monsoon harvest pressure.',
-      alternativeMarkets: ['Pune APMC', 'Mumbai wholesale'],
-      govtSchemes: ['PM-AASHA', 'e-NAM']
+      reasoning: 'The current Mandi price of Rs 2473 per quintal is higher than the Minimum Support Price (MSP) of Rs 2183 per quintal. Given the stable price trend, there is no indication that prices will increase materially in the near future. Therefore, selling now will maximize the revenue. Additionally, considering the potential earnings from carbon credits (Rs 9600), it is financially prudent to sell the produce immediately.',
+      alternativeMarkets: ['Pune APMC', 'Mumbai Agri-Produce Market Committee (APMC)', 'Surat APMC'],
+      govtSchemes: ['Pradhan Mantri Fasal Bima Yojana (PMFBY)', 'PM-AASHA', 'e-NAM']
     },
     totalPotentialIncome: 76500
   }
@@ -212,8 +387,9 @@ function RuralFarmerDashboard() {
     } catch (err) {
       console.error('Orchestrator API error:', err)
       setError('API temporarily unavailable. Demo data has been loaded automatically — you can explore all features below (Weather Insights, Market Intelligence, etc.). To reload demo data anytime, click "Load demo data".')
-      // Use fallback mock data so Weather Insights & Market Intelligence sections still appear
-      const mockRecs = MOCK_ORCHESTRATOR_RESPONSE.sustainabilityRecommendations?.map((rec, index) => ({
+      // Use dynamic mock data generator based on form inputs
+      const dynamicMockData = generateMockResponse(formData)
+      const mockRecs = dynamicMockData.sustainabilityRecommendations?.map((rec, index) => ({
         id: `mock-${index + 1}`,
         title: rec.title,
         impact: `${rec.carbonReduction} tonnes CO₂e/year reduction`,
@@ -224,7 +400,7 @@ function RuralFarmerDashboard() {
         govtScheme: rec.govtScheme
       })) || []
       setAiRecommendations(mockRecs)
-      setOrchestratorData(MOCK_ORCHESTRATOR_RESPONSE)
+      setOrchestratorData(dynamicMockData)
     } finally {
       setLoading(false)
     }
