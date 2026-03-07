@@ -336,6 +336,20 @@ function RuralFarmerDashboard() {
       if (data.marketInsights?.mandiPrices && !data.marketInsights.mandiPrices.mspPrice) {
         data.marketInsights.mandiPrices.mspPrice = data.marketInsights.mandiPrices.mspPrice ?? data.marketInsights.mandiPrices.msp
       }
+      // Normalise field names from older deployed Lambda versions
+      if (data.marketInsights?.mandiPrices) {
+        const mp = data.marketInsights.mandiPrices
+        mp.currentPrice = mp.currentPrice ?? mp.price ?? mp.marketPrice ?? mp.current_price
+        mp.mspPrice     = mp.mspPrice ?? mp.msp ?? mp.minimum_support_price
+        mp.priceTrend   = mp.priceTrend ?? mp.trend ?? mp.price_trend ?? 'STABLE'
+        mp.nearestMandi = mp.nearestMandi ?? mp.mandi ?? mp.nearest_mandi
+      }
+      if (data.marketInsights?.carbonCredits) {
+        const cc = data.marketInsights.carbonCredits
+        cc.estimatedEarnings     = cc.estimatedEarnings ?? cc.earnings ?? cc.estimated_earnings ?? 0
+        cc.currentPricePerTonne  = cc.currentPricePerTonne ?? cc.pricePerTonne ?? cc.price_per_tonne ?? 0
+        cc.registrationScheme    = cc.registrationScheme ?? cc.scheme ?? ''
+      }
       if (data.marketInsights?.marketAdvice?.govtSchemes && !Array.isArray(data.marketInsights.marketAdvice.govtSchemes)) {
         data.marketInsights.marketAdvice.govtSchemes = []
       }
