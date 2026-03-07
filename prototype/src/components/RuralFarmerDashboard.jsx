@@ -1140,20 +1140,18 @@ function RuralFarmerDashboard() {
               {(() => {
                 const mandiPrice = orchestratorData.marketInsights.mandiPrices?.currentPrice ?? 0
                 const carbonEarnings = orchestratorData.marketInsights.carbonCredits?.estimatedEarnings ?? 0
-                const apiTotal = orchestratorData.marketInsights.totalPotentialIncome ?? 0
-                // If API total looks like only carbon credits (suspiciously small), recalculate
                 const farmSizeNum = parseFloat(formData.farmSize) || 5.2
-                const estimatedCropIncome = Math.round(mandiPrice * farmSizeNum * 25)
-                const correctTotal = estimatedCropIncome + carbonEarnings
-                const displayTotal = apiTotal > carbonEarnings ? apiTotal : correctTotal
-                return <>₹{displayTotal.toLocaleString('en-IN')}</>
+                // Always calculate crop income from mandiPrice * farmSize * 25 quintals/ha
+                const cropIncome = Math.round(mandiPrice * farmSizeNum * 25)
+                const total = cropIncome + carbonEarnings
+                return <>₹{total.toLocaleString('en-IN')}</>
               })()}
             </div>
             <div className="income-breakdown">
               <span>Crop sales: ₹{Math.round((orchestratorData.marketInsights.mandiPrices?.currentPrice ?? 0) * (parseFloat(formData.farmSize) || 5.2) * 25).toLocaleString('en-IN')}</span>
               <span>Carbon credits: ₹{(orchestratorData.marketInsights.carbonCredits?.estimatedEarnings ?? 0).toLocaleString('en-IN')}</span>
             </div>
-            <p className="income-note">Includes crop sales + carbon credit earnings</p>
+            <p className="income-note">Based on {(parseFloat(formData.farmSize) || 5.2) * 25} quintals at ₹{orchestratorData.marketInsights.mandiPrices?.currentPrice ?? 0}/quintal + carbon credit earnings</p>
           </div>
         </div>
       )}
