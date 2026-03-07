@@ -13,13 +13,13 @@ const ORCHESTRATOR_URL = 'https://gylv2iabjpsbte727qkawailjm0xnctf.lambda-url.us
 const generateMockResponse = (formData) => {
   // Crop-specific MSP and market prices (realistic Indian agriculture data)
   const cropData = {
-    'Rice': { msp: 2183, currentPrice: 2473, trend: 'RISING', carbonPerHa: 2.4 },
+    'Rice': { msp: 2183, currentPrice: 2850, trend: 'RISING', carbonPerHa: 2.4 },
     'Wheat': { msp: 2275, currentPrice: 2520, trend: 'STABLE', carbonPerHa: 2.1 },
     'Cotton': { msp: 6620, currentPrice: 7100, trend: 'RISING', carbonPerHa: 3.2 },
     'Sugarcane': { msp: 315, currentPrice: 340, trend: 'STABLE', carbonPerHa: 4.5 },
     'Pulses': { msp: 7000, currentPrice: 7850, trend: 'RISING', carbonPerHa: 1.8 },
     'Vegetables': { msp: 1500, currentPrice: 1820, trend: 'RISING', carbonPerHa: 2.0 },
-    'Fruits': { msp: 2300, currentPrice: 2473, trend: 'RISING', carbonPerHa: 2.2 }
+    'Fruits': { msp: 2300, currentPrice: 3200, trend: 'RISING', carbonPerHa: 2.2 }
   }
 
   const crop = cropData[formData.primaryCrop] || cropData['Rice']
@@ -214,7 +214,7 @@ const MOCK_ORCHESTRATOR_RESPONSE = {
   },
   marketInsights: {
     mandiPrices: {
-      currentPrice: 2473,
+      currentPrice: 2850,
       mspPrice: 2183,
       nearestMandi: 'Nashik APMC',
       priceTrend: 'RISING',
@@ -228,11 +228,11 @@ const MOCK_ORCHESTRATOR_RESPONSE = {
     },
     marketAdvice: {
       sellNowOrWait: 'SELL_NOW',
-      reasoning: 'The current Mandi price of Rs 2473 per quintal is higher than the Minimum Support Price (MSP) of Rs 2183 per quintal. Given the stable price trend, there is no indication that prices will increase materially in the near future. Therefore, selling now will maximize the revenue. Additionally, considering the potential earnings from carbon credits (Rs 9600), it is financially prudent to sell the produce immediately.',
+      reasoning: 'The current Mandi price of Rs 2850 per quintal is significantly higher than the Minimum Support Price (MSP) of Rs 2183 per quintal. Given the rising price trend, selling now will maximize revenue before seasonal price pressure. Additionally, with potential carbon credit earnings of Rs 9,600, this is an excellent window to sell.',
       alternativeMarkets: ['Pune APMC', 'Mumbai Agri-Produce Market Committee (APMC)', 'Surat APMC'],
       govtSchemes: ['Pradhan Mantri Fasal Bima Yojana (PMFBY)', 'PM-AASHA', 'e-NAM']
     },
-    totalPotentialIncome: 76500
+    totalPotentialIncome: 380100
   }
 }
 
