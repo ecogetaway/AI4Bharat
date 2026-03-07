@@ -337,18 +337,45 @@ function RuralFarmerDashboard() {
         data.marketInsights.mandiPrices.mspPrice = data.marketInsights.mandiPrices.mspPrice ?? data.marketInsights.mandiPrices.msp
       }
       // Normalise field names from older deployed Lambda versions
-      if (data.marketInsights?.mandiPrices) {
-        const mp = data.marketInsights.mandiPrices
-        mp.currentPrice = mp.currentPrice ?? mp.price ?? mp.marketPrice ?? mp.current_price
-        mp.mspPrice     = mp.mspPrice ?? mp.msp ?? mp.minimum_support_price
-        mp.priceTrend   = mp.priceTrend ?? mp.trend ?? mp.price_trend ?? 'STABLE'
-        mp.nearestMandi = mp.nearestMandi ?? mp.mandi ?? mp.nearest_mandi
-      }
-      if (data.marketInsights?.carbonCredits) {
-        const cc = data.marketInsights.carbonCredits
-        cc.estimatedEarnings     = cc.estimatedEarnings ?? cc.earnings ?? cc.estimated_earnings ?? 0
-        cc.currentPricePerTonne  = cc.currentPricePerTonne ?? cc.pricePerTonne ?? cc.price_per_tonne ?? 0
-        cc.registrationScheme    = cc.registrationScheme ?? cc.scheme ?? ''
+      if (data.marketInsights) {
+        const mi = data.marketInsights
+        // If mandiPrices is missing but fields exist at top level of marketInsights
+        if (!mi.mandiPrices && (mi.currentPrice || mi.price)) {
+          mi.mandiPrices = {
+            currentPrice: mi.currentPrice ?? mi.price,
+            mspPrice: mi.mspPrice ?? mi.msp,
+            priceTrend: mi.priceTrend ?? mi.trend ?? 'STABLE',
+            nearestMandi: mi.nearestMandi ?? mi.mandi ?? 'Nashik APMC'
+          }
+        }
+        if (mi.mandiPrices) {
+          const mp = mi.mandiPrices
+          mp.currentPrice = mp.currentPrice ?? mp.price ?? mp.marketPrice ?? mp.current_price
+          mp.mspPrice     = mp.mspPrice ?? mp.msp ?? mp.minimum_support_price
+          mp.priceTrend   = mp.priceTrend ?? mp.trend ?? mp.price_trend ?? 'STABLE'
+          mp.nearestMandi = mp.nearestMandi ?? mp.mandi ?? mp.nearest_mandi ?? 'Nashik APMC'
+        }
+        if (!mi.carbonCredits && (mi.estimatedEarnings || mi.carbonEarnings)) {
+          mi.carbonCredits = {
+            estimatedEarnings: mi.estimatedEarnings ?? mi.carbonEarnings ?? 0,
+            currentPricePerTonne: mi.pricePerTonne ?? mi.carbonPrice ?? 3000,
+            registrationScheme: mi.scheme ?? 'India Carbon Market (proposed)'
+          }
+        }
+        if (mi.carbonCredits) {
+          const cc = mi.carbonCredits
+          cc.estimatedEarnings    = cc.estimatedEarnings ?? cc.earnings ?? cc.estimated_earnings ?? 0
+          cc.currentPricePerTonne = cc.currentPricePerTonne ?? cc.pricePerTonne ?? cc.price_per_tonne ?? 0
+          cc.registrationScheme   = cc.registrationScheme ?? cc.scheme ?? ''
+        }
+        if (!mi.marketAdvice && (mi.sellNowOrWait || mi.recommendation)) {
+          mi.marketAdvice = {
+            sellNowOrWait: mi.sellNowOrWait ?? mi.recommendation ?? 'SELL_NOW',
+            reasoning: mi.reasoning ?? mi.advice ?? '',
+            alternativeMarkets: mi.alternativeMarkets ?? [],
+            govtSchemes: mi.govtSchemes ?? []
+          }
+        }
       }
       if (data.marketInsights?.marketAdvice?.govtSchemes && !Array.isArray(data.marketInsights.marketAdvice.govtSchemes)) {
         data.marketInsights.marketAdvice.govtSchemes = []
