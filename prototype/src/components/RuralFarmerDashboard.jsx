@@ -1153,7 +1153,31 @@ function RuralFarmerDashboard() {
                   <span className="decision-label">Decision:</span>
                   <span className="decision-value">{orchestratorData.marketInsights.marketAdvice.sellNowOrWait?.replace(/_/g, ' ') ?? 'WAIT'}</span>
                 </div>
-                <p className="advice-reasoning">{orchestratorData.marketInsights.marketAdvice.reasoning}</p>
+                {/* Replace AI-generated reasoning with our own correctly calculated version */}
+                {(() => {
+                  const currentPrice = orchestratorData.marketInsights.mandiPrices?.currentPrice ?? 0
+                  const mspPrice = orchestratorData.marketInsights.mandiPrices?.mspPrice ?? 0
+                  const trend = orchestratorData.marketInsights.mandiPrices?.priceTrend ?? 'STABLE'
+                  const carbonEarnings = orchestratorData.marketInsights.carbonCredits?.estimatedEarnings ?? 0
+                  const farmSizeNum = parseFloat(formData.farmSize) || 5.2
+                  const totalQuintals = Math.round(farmSizeNum * 25)
+                  const cropIncome = currentPrice * totalQuintals
+                  const totalIncome = cropIncome + carbonEarnings
+                  const aboveMSP = currentPrice > mspPrice
+                  const premiumPct = mspPrice > 0 ? (((currentPrice - mspPrice) / mspPrice) * 100).toFixed(1) : 0
+                  const decision = orchestratorData.marketInsights.marketAdvice.sellNowOrWait ?? 'SELL_NOW'
+                  const trendText = trend === 'RISING' ? 'rising — prices may improve further' : trend === 'FALLING' ? 'falling — act quickly to avoid losses' : 'stable — no significant price movement expected'
+
+                  return (
+                    <p className="advice-reasoning">
+                      Current Mandi price is <strong>₹{currentPrice.toLocaleString('en-IN')}/quintal</strong>, which is {aboveMSP ? <strong style={{color:'#2e7d32'}}>{premiumPct}% above</strong> : <strong style={{color:'#c62828'}}>below</strong>} MSP of ₹{mspPrice.toLocaleString('en-IN')}/quintal.
+                      {' '}Price trend is {trendText}.
+                      {' '}For your {farmSizeNum} ha farm ({totalQuintals} quintals):
+                      crop income = ₹{cropIncome.toLocaleString('en-IN')} + carbon credits = ₹{carbonEarnings.toLocaleString('en-IN')} = <strong>Total ₹{totalIncome.toLocaleString('en-IN')}</strong>.
+                      {decision === 'SELL_NOW' ? ' Recommendation: Sell now to secure current favourable price.' : decision === 'WAIT' ? ' Recommendation: Hold — prices expected to rise.' : ' Recommendation: Sell 60–70% now, hold rest for better prices.'}
+                    </p>
+                  )
+                })()}
                 
                 {orchestratorData.marketInsights.marketAdvice.alternativeMarkets?.length > 0 && (
                   <div className="alternative-markets">
