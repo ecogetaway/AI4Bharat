@@ -1087,8 +1087,9 @@ function RuralFarmerDashboard() {
                 <span className="value">₹{orchestratorData.marketInsights.carbonCredits?.currentPricePerTonne ?? '--'}</span>
               </div>
               <div className="carbon-stat highlight">
-                <span className="label">Estimated Earnings</span>
+                <span className="label">Carbon Credit Earnings</span>
                 <span className="value-large">₹{(orchestratorData.marketInsights.carbonCredits?.estimatedEarnings ?? 0).toLocaleString('en-IN')}</span>
+                <span className="label" style={{fontSize: '0.75rem', opacity: 0.8}}>Carbon credits only (not total income)</span>
               </div>
               <div className="carbon-stat">
                 <span className="label">Scheme</span>
