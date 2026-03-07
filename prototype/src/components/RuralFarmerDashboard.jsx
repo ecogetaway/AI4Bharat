@@ -1173,7 +1173,7 @@ function RuralFarmerDashboard() {
                       Current Mandi price is <strong>₹{currentPrice.toLocaleString('en-IN')}/quintal</strong>, which is {aboveMSP ? <strong style={{color:'#2e7d32'}}>{premiumPct}% above</strong> : <strong style={{color:'#c62828'}}>below</strong>} MSP of ₹{mspPrice.toLocaleString('en-IN')}/quintal.
                       {' '}Price trend is {trendText}.
                       {' '}For your {farmSizeNum} ha farm ({totalQuintals} quintals):
-                      crop income = ₹{cropIncome.toLocaleString('en-IN')} + carbon credits = ₹{carbonEarnings.toLocaleString('en-IN')} = <strong>Total ₹{totalIncome.toLocaleString('en-IN')}</strong>.
+                      crop income = ₹{cropIncome.toLocaleString('en-IN')} + <strong style={{color:'#1565c0'}}>carbon credits ₹{carbonEarnings.toLocaleString('en-IN')} 🌱</strong> = <strong>Total ₹{totalIncome.toLocaleString('en-IN')}</strong>.
                       {decision === 'SELL_NOW' ? ' Recommendation: Sell now to secure current favourable price.' : decision === 'WAIT' ? ' Recommendation: Hold — prices expected to rise.' : ' Recommendation: Sell 60–70% now, hold rest for better prices.'}
                     </p>
                   )
