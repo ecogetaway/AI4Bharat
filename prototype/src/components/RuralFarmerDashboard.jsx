@@ -352,6 +352,11 @@ function RuralFarmerDashboard() {
           const mp = mi.mandiPrices
           mp.currentPrice = mp.currentPrice ?? mp.price ?? mp.marketPrice ?? mp.current_price
           mp.mspPrice     = mp.mspPrice ?? mp.msp ?? mp.minimum_support_price
+          // If mspPrice still missing, look it up from our local crop data
+          if (!mp.mspPrice) {
+            const MSP_LOOKUP = { rice: 2183, wheat: 2275, cotton: 6620, sugarcane: 315, pulses: 7000, vegetables: 1500, fruits: 2300 }
+            mp.mspPrice = MSP_LOOKUP[(mp.cropName || '').toLowerCase()] ?? MSP_LOOKUP[formData.primaryCrop.toLowerCase()] ?? 2183
+          }
           mp.priceTrend   = mp.priceTrend ?? mp.trend ?? mp.price_trend ?? 'STABLE'
           mp.nearestMandi = mp.nearestMandi ?? mp.mandi ?? mp.nearest_mandi ?? 'Nashik APMC'
         }
